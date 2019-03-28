@@ -35,7 +35,7 @@ Unisave consists of two parts (but they are both used in the same way):
 
 ### Unisave Local
 
-Unisave Local saves the data locally, on the player's computer. This requires you only to import the [free asset](#) into your game. No registration or cloud stuff here.
+Unisave Local saves the data locally, on the player's computer. This requires you only to import the [free asset](asset.md) into your game. No registration or cloud stuff here.
 
 Then you just make your favourite `MonoBehaviour` scripts inherit from `UnisaveLocalBehaviour` and tag favourite fields with the `[SavedAs("some-key")]` attribute.
 
