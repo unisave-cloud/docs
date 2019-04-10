@@ -3,9 +3,11 @@ Unisave Cloud
 
 Unisave Cloud builds on top of Unisave Local and allows you to save data in the cloud.
 
-> **Note:** Unisave Cloud is currently under development, so the unity asset does not contain any code for it and the documentation below is rather sparse.
+> **Note:** Unisave Cloud is currently under development, so players must be registered manually just for testing purpouses.
 
-Before you can access data, you have to login a player:
+First you need to create account in the online service and then set some properties in the unity asset configuration tab. See the [cloud connection manual](cloud-connection.md) for details.
+
+Now inside your game, you first need your player to log in:
 
 ```cs
 public class MyLoginController : MonoBehaviour, ILoginCallback
@@ -32,6 +34,8 @@ public class MyLoginController : MonoBehaviour, ILoginCallback
 
 Then in the logged-in scene you can access the data:
 
+> Note that this is practically identical to Unisave Local. The only difference being the parent class `UnisaveCloudBehaviour`.
+
 ```cs
 public class PlayerStatistics : UnisaveCloudBehaviour
 {
@@ -46,5 +50,5 @@ public class PlayerStatistics : UnisaveCloudBehaviour
 And when you're done, you logout the player:
 
 ```cs
-UnisaveCloud.Logout(); // and then load the login scene
+UnisaveCloud.Logout();
 ```

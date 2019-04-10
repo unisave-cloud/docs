@@ -70,7 +70,7 @@ Also check out the [online documentation](https://github.com/Jirka-Mayer/Unisave
 
 It's woderful that you find Unisave interesting.
 
-If you have any questions, just [send an email](mailto:jirkamayer97@gmail.com).
+If you have any questions, just [send an email](mailto:jirka@unisave.cloud).
 
 Also [leave a review](https://assetstore.unity.com/packages/slug/142705) if you think other people might be interested.
 

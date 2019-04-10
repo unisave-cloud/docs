@@ -35,7 +35,7 @@ Unisave consists of two parts (but they are both used in the same way):
 
 ### Unisave Local
 
-Unisave Local saves the data locally, on the player's computer. This requires you only to import the [free asset](asset.md) into your game. No registration or cloud stuff here.
+Unisave Local saves the data locally, on the player's computer. This requires you only to import the [free asset](https://assetstore.unity.com/packages/slug/142705) into your game. No registration or cloud stuff here.
 
 Then you just make your favourite `MonoBehaviour` scripts inherit from `UnisaveLocalBehaviour` and tag favourite fields with the `[SavedAs("some-key")]` attribute.
 
@@ -44,7 +44,7 @@ More information can be found in the documentation below.
 
 ### Unisave Cloud
 
-Unisave Cloud is an online service that works together with the asset and provides the following:
+Unisave Cloud is an [online service](https://unisave.cloud) that works together with the asset and provides the following:
 
 - Player registration and email verification
 - Player login into your game
