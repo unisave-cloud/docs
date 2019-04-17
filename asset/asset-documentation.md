@@ -63,14 +63,14 @@ You might want to save or load your script right now and not wait for `OnDestroy
 
 Look at the implementation of `Unisave/Scripts/Local/UnisaveLocalBehaviour`, it's very straight forward.
 
-Also check out the [online documentation](https://github.com/Jirka-Mayer/UnisaveDocs).
+Also check out the [online documentation](https://unisave.cloud/docs).
 
 
 ## Lastly
 
 It's woderful that you find Unisave interesting.
 
-If you have any questions, just [send an email](mailto:jirka@unisave.cloud).
+If you have any questions, just [send an email](mailto:info@unisave.cloud).
 
 Also [leave a review](https://assetstore.unity.com/packages/slug/142705) if you think other people might be interested.
 
