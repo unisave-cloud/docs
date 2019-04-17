@@ -4,7 +4,7 @@ Unisave is a free Unity asset and an online service that together solve the prob
 
 - [Installation](#installation)
 - [Unsiave Local](#unisave-local)
-- [Authentication](#)
+- [Authentication](#unisave-cloud)
 
 
 <a name="installation"></a>
@@ -47,6 +47,15 @@ public class PlayerAchievements : UnisaveLocalBehaviour
 For more information, see the [Unisave Local Documentation](unisave-local).
 
 
-## Authentication
+<a name="unisave-cloud"></a>
+## Unisave Cloud
 
-- 
+Unisave Cloud is an online service that works together with the asset and provides the following:
+
+- In-game registration and login for players
+- Saving player-related data in the cloud (like *Unisave Local*, but online)
+<!-- - Moving game-related data to the cloud for later tweaking -->
+
+Even if your game is not multiplayer, you can still synchronize player achievements between devices or monitor player behaviour.
+
+For more information, see the [Unisave Cloud Documentation](unisave-cloud).

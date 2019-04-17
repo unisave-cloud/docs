@@ -1,54 +1,98 @@
-Unisave Cloud
-=============
+# Unisave Cloud
+
+- [Video](#video)
+- [Introduction](#introduction)
+- [Registration & Login](#registration-and-login)
+- [Saving data](#saving-data)
+- [Logout](#logout)
+
+
+<a name="video"></a>
+## Video
+
+<div style="position: relative">
+    <div style="padding-top: 56.25%"></div>
+    <iframe
+    style="position: absolute; top: 0; left: 0; height: 100%"
+    width="100%"
+    height="auto"
+    src="https://www.youtube.com/embed/HQIbqRsSIYQ"
+    frameborder="0"
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
+    ></iframe>
+</div>
+
+
+<a name="introduction"></a>
+## Introduction
 
 Unisave Cloud builds on top of Unisave Local and allows you to save data in the cloud.
 
-> **Note:** Unisave Cloud is currently under development, so players must be registered manually just for testing purpouses.
+But before you can use it, you need to have a developer account on the Unisave website. The service is free for up to 100 registered players, so you can freely try it out.
 
-First you need to create account in the online service and then set some properties in the unity asset configuration tab. See the [cloud connection manual](cloud-connection.md) for details.
+After you registered, you need to create a game and set up a connection from your Unity project. The process is explained in this short [cloud connection manual](cloud-connection).
 
-Now inside your game, you first need your player to log in:
+<a name="registration-and-login"></a>
+## Registration & Login
 
-```cs
-public class MyLoginController : MonoBehaviour, ILoginCallback
-{
-    public InputField email;
-    public InputField password;
+Before you can save any data, you need to know to which player the data belongs. So we need to provide the player with a registration and a login form.
 
-    public void OnLoginButtonClick()
-    {
-        UnisaveCloud.Login(this, email.text, password.text);
-    }
+This boring user interface is best to keep in a separate scene. Now create this `LoginScene`.
 
-    public void LoginSucceeded()
-    {
-        // load the next scene
-    }
+To save you time, Unisave asset comes with a login form saved as a prefab in `Unisave/Components/Auth/Login or Register Panel.prefab`.
 
-    public void LoginFailed(LoginFailure failure)
-    {
-        // login did not succeed, display failure.message
-    }
-}
-```
+But it's a user interface, so we first need to create a canvas. Right-click the `Hierarchy` window, and create `UI > Canvas`. Now drag the prefab from the file explorer into the canvas game object.
 
-Then in the logged-in scene you can access the data:
+<img src="img/unisave-cloud_hierarchy.png">
 
-> Note that this is practically identical to Unisave Local. The only difference being the parent class `UnisaveCloudBehaviour`.
+You should be able to see the form in the scene view. Next we need to tell the panel, which scene should be loaded after a player logs in.
+
+Select the `Login or Register Panel` and scroll down the `Inspector` window. You should see a `Login Or Register Controller`. This controller has a field called `Scene Name To Load`. Here you put the path to the next scene:
+
+<img src="img/unisave-cloud_next-scene.png">
+
+
+<a name="saving-data"></a>
+## Saving data
+
+Now inside the `GarageScene` you can save data in a familiar manner:
 
 ```cs
 public class PlayerStatistics : UnisaveCloudBehaviour
 {
-    [SavedAs("statistics.races.total")]
+    [SavedAs("statistics-races-total")]
     public int racesTotal = 0;
 
-    [SavedAs("statistics.races.won")]
+    [SavedAs("statistics-races-won")]
     public int racesWon = 0;
 }
 ```
 
-And when you're done, you logout the player:
+> Note that this is practically identical to *Unisave Local*. The only difference being the parent class `UnisaveCloudBehaviour`.
+
+
+<a name="logout"></a>
+## Logout
+
+And when you're done, you logout the player and go back to the login scene.
 
 ```cs
 UnisaveCloud.Logout();
+
+SceneManager.LoadSceneAsync("Scenes/LoginScene");
 ```
+
+## TODOcument
+
+> *Unisave Cloud* documentation is being worked on, so it doesn't cover everything yet.
+
+- local testing player
+    - starting a logged-in-only scene (e.g. `GarageScene`) in Unity editor logs in a fake local player
+    - this player can be also accessed by logging in with email `'local'` and any password
+- continuous saving
+    - yes, it's saves the data in the background periodically every 5 min
+- unexpected logout handling
+    - e.g. network disconnect
+- custom login and registration logic
+    - error messages, password strength validation
+    - autoregistration

@@ -11,4 +11,6 @@ When you open the game dashboard you should see a field named `Game token`. This
 
 Copy this value to clipboard and open your Unity project (with the Unisave asset imported). Now in Unity go to `Window > Unisave`. That opens Unisave configuration panel. On this panel you can see a field named `Game token`. Here you paste the value.
 
+<img src="img/cloud-connection_game-token.png">
+
 This is all you need to do, you can continue developing your awesome game.
