@@ -8,4 +8,4 @@
 
 ### Examples
 
-[Leaderboard](leaderboard)
+[Leaderboard](example-leaderboard)
