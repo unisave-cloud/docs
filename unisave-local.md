@@ -1,5 +1,4 @@
-Unisave Local
-=============
+# Unisave Local
 
 - [Introduction](#introduction)
 - [SavedAs attribute](#saved-as)
@@ -11,22 +10,22 @@ Unisave Local
 <a name="introduction"></a>
 ## Introduction
 
-Unisave Local solves the problem of player data saving in an elegant manner. Let's analyze the example provided on the title page:
+Unisave Local solves the problem of player data saving in an elegant manner. Let's analyze the example below:
 
 ```cs
 using Unisave;
 
 public class PlayerStatistics : UnisaveLocalBehaviour
 {
-    [SavedAs("statistics.races.total")]
+    [SavedAs("statistics-races-total")]
     public int racesTotal = 0;
 
-    [SavedAs("statistics.races.won")]
+    [SavedAs("statistics-races-won")]
     public int racesWon = 0;
 
 ```
 
-So we have some kind of racing game and we want to store some statistics. We created the `PlayerStatistics` script, that will be inserted into every scene that needs to display, or modify the statistics. Now it's up to the script to handle the saving.
+We have some kind of racing game and we want to store some statistics. We created the `PlayerStatistics` script, that will be inserted into every scene that needs to display, or modify the statistics. Now it's up to the script to handle the saving.
 
 Normally we would use `PlayerPrefs` to store the values and it would require quite a bit of coding. Now we can just state a fact: "Save this field under this name." Such an approach is substantially more self-explanatory. We don't care how it's done, just that it works.
 
@@ -34,7 +33,7 @@ Normally we would use `PlayerPrefs` to store the values and it would require qui
 <a name="saved-as"></a>
 ## `SavedAs` attribute
 
-This attribute tells Unisave which fields to save and how to call them. It can be attached to any public, non-static field of your script.
+This attribute tells Unisave which fields to save and how to call them. It can be attached to any field or property of your script.
 
 The only argument is the key, under which the value will be stored.
 
