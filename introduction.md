@@ -4,7 +4,7 @@ Unisave is a free Unity asset and an online service that together solve the prob
 
 - [Installation](#installation)
 - [Unsiave Local](#unisave-local)
-- [Authentication](#unisave-cloud)
+- [Unisave Cloud](#unisave-cloud)
 
 
 <a name="installation"></a>
