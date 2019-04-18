@@ -21,7 +21,7 @@ Now you are ready to use both *Unisave Local* and *Unisave Cloud*.
 <a name="unisave-local"></a>
 ## Unisave Local
 
-*Unisave Local* is a part of the asset, that saves player data locally, on the player's computer. You only need to import the asset for this to work.
+*Unisave Local* is a part of the asset, that saves player data locally, on the player's computer. You only need to import the asset for *Unisave Local* to work.
 
 > Think `PlayerPrefs` on steroids.
 

@@ -56,7 +56,7 @@ The only argument is the key, under which the value will be stored.
 
 > **Note:** The key should be unique within the game, meaning there should not be two scripts (or two simultaneous instances of one script) with the same key on some fields. If that was to happen, the system would not work properly.
 
-The attribute does not perform the loading and saving procedure. That is enabled by inheriting from `UnisaveLocalBehaviour`.
+The attribute does not perform the loading and saving. That is enabled by inheriting from the `UnisaveLocalBehaviour` class.
 
 > **Note:** There is the `UnisaveLocalBehaviour` for local saving and the `UnisaveCloudBehaviour` for cloud saving. For more info about the cloud saving see the related documentation page.
 
@@ -64,9 +64,44 @@ The attribute does not perform the loading and saving procedure. That is enabled
 <a name="loading-and-saving"></a>
 ## Loading and saving
 
-The data is loaded during `Awake()` so it's already prepared for you in the `Start()` method. Saving takes place in the `OnDestroy()` method. This logic is implemented in the `UnisaveLocalBehaviour` class.
+The data is loaded during `Awake()`, so it's already prepared for you in the `Start()` method. Saving takes place in the `OnDestroy()` method. This logic is implemented in the `UnisaveLocalBehaviour` class.
 
-If you want to perform loading and saving at a different moment, you can define it yourself:
+Because of the way C# and Unity work, if you need to both inherit from `UnisaveLocalBehaviour` and use methods `Awake` or `OnDestroy`, then you need to define those methods as *virtual, overriding* the parent implementation:
+
+```cs
+public class MyScript : UnisaveLocalBehaviour
+{
+    protected override void Awake()
+    {
+        // here I shouldn't touch any fields,
+        // they will be overwritten during loading
+
+        base.Awake(); // here loading takes place
+
+        // now I can work with the fields as usual
+    }
+
+    protected override void OnDestroy()
+    {
+        // I can still modify any fields
+
+        base.OnDestroy(); // here saving takes place
+
+        // now my changes won't be saved
+    }
+}
+```
+
+> **Note:** If you forget to write the keyword `override`, you will get a warning that your method "hides inherited member" and no saving will take place.
+
+> **Warning:** If you forget to call the `base.` methods, no saving or loading will be performed.
+
+
+### Custom loading and saving
+
+If you you want to save the fields at a specific moment, because you don't want to wait until `OnDestroy` gets called or you want to completely change the loading and saving time, you can use methods `Load(behaviour)` and `Save(behaviour)` on the `UnisaveLocal` facade.
+
+In such cases you usually don't need to inherit from `UnisaveLocalBehaviour` anymore.
 
 ```cs
 using Unisave;
@@ -85,9 +120,14 @@ public class MyScript : MonoBehaviour
 }
 ```
 
-Note that we no longer inherit from the `UnisaveLocalBehaviour`. The `UnisaveLocalBehaviour` class is only meant as a shortcut for convenience, but it's by no means mandatory.
+Another reason you might want to use these methods is, when you need to inherit from a different parent class. The `UnisaveLocalBehaviour` class is only meant as a shortcut for convenience, but it's by no means mandatory.
 
 Now we have an idea of what's actually going on below the surface. We call the methods `UnisaveLocal.Load` and `UnisaveLocal.Save` and they look at our script, find all fields marked with `[SavedAs(...)]` and perform the necessary action.
+
+
+### Serialization
+
+If you want to know, which types and structures can be saved and how they are saved, take a look at the [serialization documentation](serialization).
 
 
 <a name="default-value"></a>
