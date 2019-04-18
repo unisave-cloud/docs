@@ -18,3 +18,11 @@ class Motorbike
     public float power;
 }
 ```
+
+<!--
+    What doesn!t work
+    - meshes, game objects, prefabs, textures
+    - high volume data
+    - cyclic dependencies
+    - polymorphism
+-->
