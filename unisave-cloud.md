@@ -10,6 +10,11 @@
 - [Custom login and registration](#custom-login-and-registration)
 
 
+## **Deprecated**
+
+> This version of *Unisave Cloud* is being replaced by a new architecture of the system that provides you with way more customization. This documentation page is thus deprecated and the functionality will be removed from the asset soon. See **[New Cloud](new-cloud)** page instead.
+
+
 <a name="video"></a>
 ## Video
 
