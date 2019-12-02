@@ -1,7 +1,39 @@
 
-[Old documentation!](old-documentation)
+### Core
 
 [Introduction](introduction)
+
+[Installation](installation)
+
+[Authentication](authentication)
+
+[Facets](facets)
+
+[Entities](entities)
+
+
+### Modules
+
+[Overview](modules)
+
+[Matchmaker](matchmaker)
+
+[Leaderboards](leaderboards)
+
+
+### Advanced
+
+[Clients & databases](clients-and-databases)
+
+[Serialization](serialization)
+
+<hr>
+
+### Old docs
+
+[Old documentation!](old-documentation)
+
+[Introduction](old-introduction)
 
 [Unisave Local](unisave-local)
 

@@ -1,61 +1,36 @@
 # Introduction
 
-Unisave is a free Unity asset and an online service that together solve the problem of player data persistence.
+Unisave is a service providing backend for games, targeting Unity engine and C# language. Primary focus is on ease of use.
 
 - [Installation](#installation)
-- [Unsiave Local](#unisave-local)
-- [Unisave Cloud](#unisave-cloud)
+- [Architecture](#architecture-basics)
 
 
 <a name="installation"></a>
 ## Installation
+
+> TODO: move to the installation page
 
 - Open your game in Unity
 - Open the asset store window by going to menu `Window > Asset Store`
 - Search for `Unisave` and open <a href="https://assetstore.unity.com/packages/slug/142705" target="_blank">this asset</a>.
 - Click `Download`, then `Import` and import all the files
 
-Now you are ready to use both *Unisave Local* and *Unisave Cloud*.
+> TODO: create account, a game and connect it with the asset
+
+> See "Cloud conection" page for that
 
 
-<a name="unisave-local"></a>
-## Unisave Local
+<a name="architecture-basics"></a>
+## Architecture basics
 
-*Unisave Local* is a part of the asset, that saves player data locally, on the player's computer. You only need to import the asset for *Unisave Local* to work.
+- what is backend
+    - in general, PHP+MySQL
+- client & server architecture
+    - see the doc page
+- database architecture
+    - see the doc page
 
-> Think `PlayerPrefs` on steroids.
-
-Once you import the asset, you can save your data by simply stating a fact:<br>"Save this awesome field under this name."
-
-```cs
-using Unisave;
-
-public class PlayerAchievements : UnisaveLocalBehaviour
-{
-    [SavedAs("achievements")]
-    public List<string> takenAchievements = new List<string>();
-
-    [SavedAs("distance-walked")]
-    public float walkedDistance = 0.0f;
-
-```
-
-> **Note:** Don't forget on `using Unsiave;` and the `UnisaveLocalBehaviour` parent
-
-*Unisave Local* is completely free, you can use it however you like.
-
-For more information, see the [Unisave Local Documentation](unisave-local).
-
-
-<a name="unisave-cloud"></a>
-## Unisave Cloud
-
-Unisave Cloud is an online service that works together with the asset and provides the following:
-
-- In-game registration and login for players
-- Saving player-related data in the cloud (like *Unisave Local*, but online)
-<!-- - Moving game-related data to the cloud for later tweaking -->
-
-Even if your game is not multiplayer, you can still synchronize player achievements between devices or monitor player behaviour.
-
-For more information, see the [Unisave Cloud Documentation](unisave-cloud).
+- workflow
+    - clients and databases
+    - emulation
