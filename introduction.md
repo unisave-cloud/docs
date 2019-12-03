@@ -90,12 +90,12 @@ public class PlayerEntity : Entity
     /// <summary>
     /// Name displayed to other players
     /// </summary>
-    [X] public string Nickname { get; set; }
+    [X] public string Nickname { get; set; } = "Unnamed";
 
     /// <summary>
     /// Number of coins owned
     /// </summary>
-    [X] public int Coins { get; set; }
+    [X] public int Coins { get; set; } = 200;
 }
 ```
 
