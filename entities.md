@@ -512,7 +512,7 @@ var nonAveragePlayers = GetEntity<PlayerEntity>
 <a name="more-complex-filtering"></a>
 ### More complex filtering
 
-You want to make a filter, that cannot be expressed with provided *where* caluses. Then you have no other option, but to do the filtering manually inside memory:
+You want to make a filter, that cannot be expressed with provided *where* clauses. Then you have no other option, but to do the filtering manually in memory:
 
 ```cs
 using System.Linq;
