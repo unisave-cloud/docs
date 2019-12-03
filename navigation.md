@@ -1,9 +1,14 @@
 
-### Core
+### Getting started
+
+[Installation](installation)
 
 [Introduction](introduction)
 
-[Installation](installation)
+[Workflow](workflow)
+
+
+### Core
 
 [Authentication](authentication)
 
