@@ -23,14 +23,20 @@
 
 [Matchmaker](matchmaker)
 
+<!--
 [Leaderboards](leaderboards)
+-->
 
 
 ### Advanced
 
+<!--
 [Clients & databases](clients-and-databases)
+-->
 
 [Serialization](serialization)
+
+<!--
 
 <hr>
 
@@ -54,3 +60,5 @@
 ### Examples
 
 [Leaderboard](example-leaderboard)
+
+-->
