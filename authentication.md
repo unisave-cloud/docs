@@ -1,9 +1,18 @@
 # Authentication
 
+- [Quickstart with prefab](#quickstart-with-prefab)
+- [Manual authentication](#manual-authentication)
+    - [Registration](#registration)
+    - [Login](#login)
+    - [Logout](#logout)
+    - [Getting state](#getting-state)
+- [Registration hooks](#registration-hooks)
+
 
 Player authentication is important, because only logged in players can communicate with the backend server.
 
 
+<a name="quickstart-with-prefab"></a>
 ## Quickstart with prefab
 
 Quickest way to get started is to use the registration and login form, that comes with Unisave asset. This prefab is located at `Unisave/Components/Auth/Login or Register Panel.prefab`.
@@ -21,9 +30,11 @@ Select the `Login or Register Panel` and scroll down the `Inspector` window. You
 This prefab can be customized however you want, but if you need even more control, you can go deeper:
 
 
+<a name="manual-authentication"></a>
 ## Manual authentication
 
 
+<a name="registration"></a>
 ### Registration
 
 You can register a new player by calling `Auth.Register(...)`:
@@ -56,6 +67,7 @@ On failure, just check what type the thrown exception is. Here is a quick overvi
     - `InvalidPasswordException`
 
 
+<a name="login"></a>
 ### Login
 
 Login is performed by the `Auth.Login(...)` method:
@@ -84,6 +96,7 @@ When login fails, it always throws an exeception of type `Unisave.Authentication
 > **Note:** Login failure behaves differently compared to registration, because it uses an older approach.
 
 
+<a name="logout"></a>
 ### Logout
 
 Logging out is simple:
@@ -93,6 +106,7 @@ Auth.Logout();
 ```
 
 
+<a name="getting-state"></a>
 ### Getting state
 
 You can get the currently logged in player:
@@ -113,6 +127,7 @@ else
 ```
 
 
+<a name="registration-hooks"></a>
 ## Registration hooks
 
 Registration hooks are a way to perform some action when a new player is registered.
