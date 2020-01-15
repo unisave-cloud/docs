@@ -47,6 +47,8 @@ Finally you need a place for your server-side scripts. This is the `Backend` fol
 
 To create the `Backend` folder, simply right click in the assets folder and choose `Create > Unisave > Backend folder`.
 
+> With the asset set up and backend folder created you can proceed to [the introduction](introduction), since the following text explains updating and troubleshooting.
+
 
 <a name="updating-the-asset"></a>
 ## Updating the asset
@@ -71,4 +73,4 @@ This error message is shown when you have missing or incorrect `Game token` or `
 
 <img src="img/installation_missing-backend.png">
 
-This means, that your `Backend` folder is missing. The other options is that there's a wrong path to the folder set in Unisave preferences.
+This means, that your `Backend` folder is missing. Or that there's simply an incorrect path in the Unisave preferences window.

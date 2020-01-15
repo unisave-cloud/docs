@@ -36,7 +36,7 @@
 
 Unisave database holds only two kinds of objects: players and entities. Players obviously represent players of your game and are represented by the `UnisavePlayer` class. Entities on the other hand can represent anything you want.
 
-Entity is basically just a fancy C# class, that has the ability to be saved and then later retrieved.
+Entity is basically just a fancy C# class, that has the ability to be saved and then later loaded.
 
 Entity has also the option of belonging to some players, which allows it to be easily queried.
 

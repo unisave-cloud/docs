@@ -24,9 +24,24 @@ Here is a list of things that can be saved by Unisave:
 - `Vector2`, `Vector3`
 - `Vector2Int`, `Vector3Int`
 
+**Arrays**
+
+- `byte[]`, `Vector3[]`, ...
+
 **Collections**
 
-- `List<T>`, `Dictionary<string, T>`
+- `List<T>`, `Dictionary<TK, TV>`
+
+**Enums**
+
+```cs
+enum MyEnum
+{
+    One,
+    Two = 2,
+    Three = 3
+}
+```
 
 **Your own classes**
 
@@ -50,19 +65,9 @@ The `[Serializable]` attribute is not needed.
 <a name="planned-types"></a>
 ## Planned types
 
-**Arrays**
-
-- `byte[]`, `Vector3[]`, ...
-
 **Geometry**
 
 - `Transform`, `Matrix4x4`, `Quaternion`, `Vector4`
-
-**Enums**
-
-```cs
-enum MyEnum { One, Two, Three }
-```
 
 
 <a name="how-it-works"></a>
@@ -73,25 +78,6 @@ The data is stored in the form of JSON. The format works well with hierarchical 
 > **Credit:** Unisave uses [LightJson](https://github.com/MarcosLopezC/LightJson), which is a wonderful lightweight library for working with JSON in C#
 
 When saving a field, Unisave looks at the type of the field and it will use this type for serialization regardless of type of the actual value.
-
-```cs
-/*
-    Will not work, object has no public fields.
-    The resulting JSON will be just this: "{}"
-    When loaded, a new dumm instance of object will be created.
- */
-
-[SavedAs("foo")]
-object myNumber = 42;
-
-// these are the correct ways:
-
-[SavedAs("foo")]
-byte myNumber = 42;
-
-[SavedAs("foo")]
-float myNumber = 42;
-```
 
 
 <a name="what-doesnt-work"></a>
@@ -116,6 +102,6 @@ The benefit is low and the complexity high. It's not worth implementing, because
 
 **Polymorphism**
 
-This is the example above with saving a number as an `object`. For this to work I would need to save the type together with the data itself (because I need to know the type during loading). This might be done for standard types, but it would be more difficult for user-defined types.
+For polymorphism to work I would need to save the type together with the data itself (because I need to know the type during loading). This might be done for standard types, but it would be more difficult for user-defined types.
 
 Also saving type information couples the database with your game very tightly making it difficult to change the data structure later.

@@ -9,9 +9,7 @@
 <a name="backend-folder"></a>
 ## Backend folder
 
-*Facets* and *entities* are objects that primarily live on the server. The backend is prepresented by a folder called `Backend` located right inside the assets folder.
-
-Any code you put into this folder will be available on the server and so can be used inside *facets* or *entities*.
+*Facets* and *entities* are objects that live on the server. Your backend server is represented by a folder called `Backend` located right inside the assets folder. Any code you put into this folder will be executed by Unisave in the cloud.
 
 > **Tip:** To quickly create the `Backend` folder, simply right-click the assets folder and choose `Create > Unisave > Backend folder`.
 
@@ -21,9 +19,9 @@ Any code you put into this folder will be available on the server and so can be 
 <a name="backend-uploading"></a>
 ## Backend uploading
 
-The `Backend` folder is located inside your Unity project. How does it get to the server?
+The `Backend` folder is located inside your Unity project. How does it get to Unisave cloud?
 
-This is handled by backend uploading. Each time you modify contents of the folder, it will be detected and the new content will be sent to Unisave cloud. This way the server always has the latest version of code to run.
+This is handled by backend uploading. Each time you modify contents of the folder, it will be detected and the new content will be sent to Unisave cloud. This way Unisave always has the latest version of your server code to run.
 
 > **Tip:** Automatic uploading can be disabled in Unisave preferences, which is handy when you lack internet connection for example.
 
