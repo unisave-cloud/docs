@@ -1,6 +1,20 @@
 # Matchmaker
 
+-  [What is a matchmaker](#what-is-a-matchmaker)
+-  [Terminology](#terminology)
+-  [Creating a matchmaker](#creating-a-matchmaker)
+    - [Dealing with time](#dealing-with-time)
+    - [Matching players against AI](#matching-players-against-ai)
+    - [Cleaning up old matches](#cleaning-up-old-matches)
+-  [Using the matchmaker](#using-the-matchmaker)
+    - [Canceling matchmaking](#canceling-matchmaking)
+    - [Querying match of a player](#querying-match-of-a-player)
+-  [Advanced topics](#advanced-topics)
+    - [Naming matchmakers](#naming-matchmakers)
+    - [How matchmaker remembers tickets](#how-matchmaker-remembers-tickets)
 
+
+<a name="what-is-a-matchmaker"></a>
 ## What is a matchmaker
 
 Matchmaker is a black box, that accepts *players* and groups them into *matches*. For now we don't care how it works, all we need to know is that from the player's perspective the interaction is relatively simple:
@@ -11,6 +25,7 @@ Matchmaker is a black box, that accepts *players* and groups them into *matches*
 From the matchmaker's perspective the process is also simple. You define a method called `CreateMatches` that gets a list of waiting players with their additional data and it splits the list up into groups and creates a *match* for each group. You don't need to think about calling this method, it is handled for you.
 
 
+<a name="terminology"></a>
 ## Terminology
 
 **MatchEntity** is an ordinary entity, that you define. It represents a single *match*, a single race, battle, fight, ... Owners of this entity are the players participating in the match. The relationship of those players have to be captured by additional entity attributes you specify (who starts, who plays white, ...).
@@ -22,6 +37,7 @@ From the matchmaker's perspective the process is also simple. You define a metho
 **MatchmakerClient** is a *MonoBehaviour* component, that you place into your scene and it is responsible for communicating with the matchmaker. Basically it can start waiting and cancel waiting and then it has two events it can handle: when the player is matched and when the waiting is canceled.
 
 
+<a name="creating-a-matchmaker"></a>
 ## Creating a matchmaker
 
 You need to create two files, the matchmaker backend logic and the matchmaker client component. First go to the `Backend` folder, right click and choose `Create > Unisave > Matchmaking > Matchmaker`. Confirm the default file name.
@@ -94,6 +110,7 @@ Then there's the heart of the matchmaker. `CreateMatches` method gets called whe
 5. **Repeat until there are no compatible tickets.**
 
 
+<a name="dealing-with-time"></a>
 ### Dealing with time
 
 When you make decitions on what players to match, it might be useful to know, how long are the players waiting in the matchmaker. For this, you can use two properties of a ticket:
@@ -117,6 +134,7 @@ Now it becomes important to know, when the `CreateMatches` method gets called. B
 > **Note:** There's no delay between joining the matchmaker and the first poll. So a player might be matched immediately, when lucky.
 
 
+<a name="matching-players-against-ai"></a>
 ### Matching players against AI
 
 When there's not many players online, there might not be enough of them, to fill up an entire match. So when a player waits for too long (say above 30 seconds), they should be matched against an AI.
@@ -141,11 +159,42 @@ Then in your game client, instead of joining a Photon room, you just start a sin
 But again, this depends entirely on your game and is specific to it. You will need to figure out the specifics by yourself.
 
 
+<a name="cleaning-up-old-matches"></a>
 ### Cleaning up old matches
 
-> **TODO**
+It's important that you remove `MatchEntities` that are no longer needed. Luckily the default matchmaker implementation already removes match entities that have been created more than 24 hours ago.
+
+If you want to have matches that live longer than that, or you want to do the garbage collection by yourself, you can override the `CleanUpMatches` method:
+
+```cs
+public class MatchmakerFacet : BasicMatchmakerFacet
+    <MatchmakerTicket, MatchEntity>
+{
+    protected override void PrepareNewTicket(MatchmakerTicket ticket)
+    {...}
+    
+    protected override void CreateMatches(List<MatchmakerTicket> tickets)
+    {...}
+
+    protected override void CleanUpMatches()
+    {
+        var matches = GetEntity<TMatchEntity>
+            .OfAnyPlayers()
+            .GetEnumerable();
+
+        foreach (var match in matches)
+        {
+            if (match.IsDead) // your custom check here
+                match.Delete();
+        }
+    }
+}
+```
+
+This method gets called each time some player polls the matchmaker.
 
 
+<a name="using-the-matchmaker"></a>
 ## Using the matchmaker
 
 Now that you have a matchmaker created, you need to talk with it from your game client. This talking is performed by a *matchmaker client*, so let's create one.
@@ -199,6 +248,7 @@ Then you define a method `JoinedMatch` that is called when you are assigned to a
 You can use `match.EntityId`, as an identifier for a room, connection, whatever...
 
 
+<a name="canceling-matchmaking"></a>
 ### Canceling matchmaking
 
 When the player no longer wants to wait and clicks some kind of "back" button, you need to call `StopWaitingForMatch()`. This will take some time to process and once it's done, a callback will be run:
@@ -230,6 +280,7 @@ Make sure you do it this way and you don't just leave the scene. The player woul
 Also note that just because a player has been matched, doesn't mean they will join the Photon room. They might loose internet connection, so you need to have some timeout and start the match even if some players are missing.
 
 
+<a name="querying-match-of-a-player"></a>
 ### Querying match of a player
 
 When the match ends, data about the match is collected by each participating player and then sent to the server for reviewing. You might compare what each player says and go with the majority to prevent cheating. But this is rather advanced and an overkill for a small beginning game. It's entirely ok to just trust what each individual player says.
@@ -285,14 +336,17 @@ public void GiveReward()
 ```
 
 
+<a name="advanced-topics"></a>
 ## Advanced topics
 
 
+<a name="naming-matchmakers"></a>
 ### Naming matchmakers
 
 You might need to have multiple matchmakers. Unisave got you covered even in such case. You simply create another matchmaker, just make sure you rename all the classes appropriately to not confuse them. Also make sure you name `MatchmakerFacet` class differently. If you want to keep the class name, you can override the `GetMatchmakerName` method on the matchmaker facet. This method by default returns name of the matchmaker facet type. This name is used for storing the matchmaker state, see below.
 
 
+<a name="how-matchmaker-remembers-tickets"></a>
 ### How matchmaker remembers tickets
 
 All the tickets and other additional information is stored in a `BasicMatchmakerEntity` inside the database. This entity has name of the matchmaker it belongs to.
