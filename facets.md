@@ -40,7 +40,7 @@ Each public method on this class can be called over the internet.
 
 > **Note:** Protected, private or static methods cannot be called remotely.
 
-> **Warning:** Make sure you don't accidentally create a public helper method here, since it could be called remotely and this might pose a security risk to your game. Make all helper methods private or protected instead.
+> **Warning:** Make sure you don't accidentally create a public helper method here since it could be called remotely and this might pose a security risk to your game. Make all helper methods private or protected instead.
 
 
 <a name="calling-a-facet-method"></a>
@@ -72,7 +72,7 @@ public class MyScript : MonoBehaviour
 }
 ```
 
-You can notice, that it's not exactly like calling an ordinary method. This is because of the time it takes for the call to complete. It may take hundreds of milliseconds, depending on the internet connection so you cannot wait, because your game would freeze. Instead you register a callback using the `.Then(...)` method, that will be called once.
+You can notice, that it's not exactly like calling an ordinary method. This is because of the time it takes for the call to complete. It may take hundreds of milliseconds, depending on the internet connection so you cannot wait, because your game would freeze. Instead, you register a callback using the `.Then(...)` method, that will be called once.
 
 It's usually more convenient to use a lambda function for the callback:
 
@@ -85,9 +85,9 @@ OnFacet<HomeFacet>
     .Done();
 ```
 
-> **Note:** The first argument that `Call<T>(...)` accepts is name of the method to call. By using the `nameof` construct you tell your IDE, that this string is not any arbitrary string, but a method name. When you automatically rename the method, the code inside the `nameof` expression will be updated accordingly.
+> **Note:** The first argument that `Call<T>(...)` accepts is the name of the method to call. By using the `nameof` construct you tell your IDE, that this string is not any arbitrary string, but a method name. When you automatically rename the method, the code inside the `nameof` expression will be updated accordingly.
 
-> **Credit:** Unisave uses promises library by Real Serious Games, that provides implementation of these `.Then`, `.Catch` and `.Done` methods. Check out their [Github repository](https://github.com/Real-Serious-Games/C-Sharp-Promise).
+> **Credit:** Unisave uses promises library by Real Serious Games, that provides an implementation of these `.Then`, `.Catch` and `.Done` methods. Check out their [Github repository](https://github.com/Real-Serious-Games/C-Sharp-Promise).
 
 
 <a name="arguments"></a>
@@ -108,13 +108,13 @@ OnFacet<MatchmakerFacet>
     .Done();
 ```
 
-> **Note:** Argumets have to match the declaration exactly (same count, same type).
+> **Note:** Arguments have to match the declaration exactly (same count, same type).
 
 
 <a name="return-value"></a>
 ### Return value
 
-Since the facet method is called in this unusual way, C# has no way of knowing the return type of the called method. You have to provide it as type parameter to the `Call<TReturn>(...)` method:
+Since the facet method is called in this unusual way, C# has no way of knowing the return type of the called method. You have to provide it as a type parameter to the `Call<TReturn>(...)` method:
 
 ```cs
 OnFacet<HomeFacet>
@@ -154,7 +154,7 @@ OnFacet<MatchmakerFacet>
     });
 ```
 
-Note that you have to call either the `.Catch(...)` method, or the `.Done()` method. When neither is present, all exceptions will be silenced and that will make debugging really difficult.
+Note that you have to call either the `.Catch(...)` method, or the `.Done()` method. When neither is present, all exceptions will be silenced and that will make debugging difficult.
 
 > **Note:** `Done()` acts like a `Catch(...)` that reports exceptions to the console.
 
@@ -189,9 +189,9 @@ public class MyScript : MonoBehaviour
 
 While this approach is more readable, it comes with its own problems. Make sure you fully understand the consequences of using `async` and `await` inside Unity before using it.
 
-> **Tip:** If you want to understand the differences between callbacks, async-await and coroutines, watch this video from Unite Copenhagen 2019: [https://www.youtube.com/watch?v=7eKi6NKri6I](https://www.youtube.com/watch?v=7eKi6NKri6I)
+> **Tip:** If you want to understand the differences between callbacks, async-await, and coroutines, watch this video from Unite Copenhagen 2019: [https://www.youtube.com/watch?v=7eKi6NKri6I](https://www.youtube.com/watch?v=7eKi6NKri6I)
 
-This approach however has the advantage, that you can use `try` and `catch` the way you are used to:
+This approach, however, has the advantage, that you can use `try` and `catch` the way you are used to:
 
 ```cs
 try
@@ -210,7 +210,7 @@ catch (PlayerAlreadyWaitingException)
 <a name="caller-property"></a>
 ## `Caller` property
 
-When you write a facet method, you often need to know, what player called the method (what player is logged in on the game client). For this reason you have the `this.Caller` property inherited from the `Facet` class:
+When you write a facet method, you often need to know, what player called the method (what player is logged in on the game client). For this reason, you have the `this.Caller` property inherited from the `Facet` class:
 
 ```cs
 using System;
@@ -243,7 +243,7 @@ public class ShopFacet : Facet
 <a name="multiple-return-values"></a>
 ## Multiple return values
 
-Sometimes you need to return multiple values from a facet method. For example when you need to load a garage, you need to have data about the player, data about the motorbikes they own, achievements they unlocked, ...
+Sometimes you need to return multiple values from a facet method. For example, when you need to load a garage, you need to have data about the player, data about the motorbikes they own, achievements they unlocked, ...
 
 The cleanest way to do that is to simply define a new class to act as a data container:
 
