@@ -1,3 +1,6 @@
+> **Warning:** Authentication is still in development and not officially supported yet. This documentation page might be outdated.
+
+
 # Authentication
 
 - [Quickstart with prefab](#quickstart-with-prefab)

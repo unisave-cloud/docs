@@ -2,7 +2,7 @@
 
 - [Web application](#web-application)
 - [Unity asset setup](#unity-asset-setup)
-- [Creating backend folder](#creating-backend-folder)
+- [Creating the backend folder](#creating-backend-folder)
 - [Updating the asset](#updating-the-asset)
 - [Troubleshooting](#troubleshooting)
 
@@ -14,11 +14,11 @@ Before you start working in Unity, you first need an account at [unisave.cloud](
 
 - Go to [https://unisave.cloud/](https://unisave.cloud/)
 - Click `Sign Up` and fill out the form
-- Wait for a verification email, this may take a while
-- Go to the app [https://unisave.cloud/app](https://unisave.cloud/app)
-- Click `Create new game` and provide a name
+- You will be redirected to the app at [https://unisave.cloud/app](https://unisave.cloud/app)
+- Click `Create new game` and type in a name
+- You will see the *Development* board of your newly created game
 
-Keep this page open in the browser, since you will need it later on. Now you can open up your Unity project.
+Keep this page open in the browser since you will need it later. Now you can open up your Unity project.
 
 <img src="img/installation_game-detail.png" style="border: 1px solid #aaa">
 
@@ -33,31 +33,31 @@ Inside Unity with your project open, you need to install the free Unisave asset 
 - Search for `Unisave` and open <a href="https://assetstore.unity.com/packages/slug/142705" target="_blank">this asset</a>.
 - Click `Download`, then `Import` and import all the files
 
-Now you need to tell the asset, how to connect to the cloud service. Specifically it needs those two values you've seen above: `Game token` and `Editor key`.
+Now you need to tell the asset how to connect to the cloud service. The asset needs to know the `Game token` and the `Editor key`, both of which can be found on the *Development* board of your game  (see the image above).
 
-In Unity, open Unisave preferences window by clicking on menu `Window > Unisave > Preferences`. And copy-paste values from the web application:
+In Unity, open Unisave preferences window by clicking on menu `Window > Unisave > Preferences` and copy-paste values from the web application:
 
 <img src="img/installation_server-connection.png">
 
 
 <a name="creating-backend-folder"></a>
-## Creating backend folder
+## Creating the backend folder
 
-Finally you need a place for your server-side scripts. This is the `Backend` folder. This is where all of your Unisave related logic of your game lives.
+The `Backend` folder is the place where all of your Unisave related logic lives.
 
 To create the `Backend` folder, simply right click in the assets folder and choose `Create > Unisave > Backend folder`.
 
-> With the asset set up and backend folder created you can proceed to [the introduction](introduction), since the following text explains updating and troubleshooting.
+> With the *Unisave asset* set up and the *backend folder* created, you can proceed to [the introduction](introduction). The following text explains updating and troubleshooting.
 
 
 <a name="updating-the-asset"></a>
 ## Updating the asset
 
-Unity has a bit tricky asset updating. The problem is, that it only adds and modifies files, it does not remove old files. This is a problem, since Unisave asset is full of C# code and you really want deprecated files to be removed. **Otherwise the update will probably break the asset.**
+Unity has a bit tricky asset updating. The problem is that it only adds and modifies files, it does not remove old files. This is a problem since Unisave asset is full of C# code and you want to remove deprecated files, **otherwise the update might break the Unisave asset.**
 
 Best way to install an update is to just remove the `Unisave` folder entirely and pull the new one. You will however have to set the `Game token` again. To preserve preferences, you can delete everything except for the `Unisave/Resources` folder.
 
-This asset updating behaviour is rather weird, but it has it's reasons, so we have to just deal with it.
+The asset updating behaviour is rather weird, but it has it's reasons, so we have to just deal with it.
 
 
 <a name="troubleshooting"></a>

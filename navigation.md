@@ -10,18 +10,18 @@
 
 ### Core
 
-[Authentication](authentication)
-
 [Facets](facets)
 
 [Entities](entities)
+
+[<span style="opacity: 0.5">Authentication</span>](authentication)
 
 
 ### Modules
 
 [Overview](modules)
 
-[Matchmaker](matchmaker)
+[<span style="opacity: 0.5">Matchmaker</span>](matchmaker)
 
 <!--
 [Leaderboards](leaderboards)
