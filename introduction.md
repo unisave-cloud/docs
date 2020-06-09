@@ -19,9 +19,8 @@ Below is a `HomeFacet` that returns data about the logged-in player when a home 
 
 ```cs
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unisave;
+using Unisave.Facades;
 
 public class HomeFacet : Facet
 {
@@ -30,12 +29,11 @@ public class HomeFacet : Facet
     /// </summary>
     public PlayerEntity GetPlayerEntity()
     {
-        // pull data from the database
-        PlayerEntity entity = GetEntity<PlayerEntity>
-            .OfPlayer(this.Caller)
-            .First();
+        // obtain authenticated player ID from the session
+        // and load player data from the database
+        PlayerEntity entity = Auth.GetPlayer<PlayerEntity>();
 
-        // send data back to the caller
+        // send the data back to the game client
         return entity;
     }
 }
@@ -49,25 +47,20 @@ Of course, there needs to be some `MonoBehaviour` in the home scene that actuall
 
 ```cs
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unisave;
+using UnityEngine;
 
 public class HomeSceneController : MonoBehaviour
 {
-    void Start()
+    async void Start()
     {
-        OnFacet<HomeFacet>
-            .Call<PlayerEntity>(nameof(HomeFacet.GetPlayerEntity))
-            .Then(PlayerInfoObtained)
-            .Done();
-    }
+        PlayerEntity player = await OnFacet<HomeFacet>
+            .Call<PlayerEntity>(
+                nameof(HomeFacet.GetPlayerEntity)
+            );
 
-    void PlayerInfoObtained(PlayerEntity playerEntity)
-    {
-        Debug.Log("Player: " + playerEntity.Nickname);
-        Debug.Log("Coins: " + playerEntity.Coins);
+        Debug.Log("Player: " + player.Nickname);
+        Debug.Log("Coins: " + player.Coins);
     }
 }
 ```
@@ -82,8 +75,6 @@ This `PlayerEntity` is defined as follows:
 
 ```cs
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unisave;
 
 public class PlayerEntity : Entity
@@ -91,12 +82,12 @@ public class PlayerEntity : Entity
     /// <summary>
     /// Name displayed to other players
     /// </summary>
-    [X] public string Nickname { get; set; }
+    public string Nickname { get; set; }
 
     /// <summary>
     /// Number of coins owned
     /// </summary>
-    [X] public int Coins { get; set; }
+    public int Coins { get; set; }
 }
 ```
 
