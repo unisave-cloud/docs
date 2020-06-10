@@ -2,8 +2,7 @@
 
 - [Backend folder](#backend-folder)
 - [Backend uploading](#backend-uploading)
-- [Auto-login and emulation](#autologin-and-emulation)
-- [Run against the real server](#run-against-the-real-server)
+- [Web development board](#web-development-board)
 
 
 <a name="backend-folder"></a>
@@ -19,50 +18,22 @@
 <a name="backend-uploading"></a>
 ## Backend uploading
 
-The `Backend` folder is located inside your Unity project. How does it get to Unisave cloud?
+The `Backend` folder is located inside your Unity project. It needs to get to the cloud to be available to Unisave. This process is called *backend uploading*. When you modify the contents of the `Backend` folder, the changes will be uploaded to the Unisave cloud. This way Unisave always has the latest version of your server code to run.
 
-This is handled by backend uploading. Each time you modify contents of the folder, it will be detected and the new content will be sent to Unisave cloud. This way Unisave always has the latest version of your server code to run.
-
-> **Tip:** Automatic uploading can be disabled in Unisave preferences, which is handy when you lack internet connection for example.
+> **Tip:** Automatic uploading can be disabled in Unisave preferences, which is handy when you lack an internet connection, for example.
 
 <img src="img/workflow_backend-uploading.png">
 
 
-<a name="autologin-and-emulation"></a>
-## Auto-login and emulation
+<a name="web-development-board"></a>
+## Web development board
 
-Say you have our home scene from [the introduction](introduction#calling-server-methods) and you hit the *play button*. What happens?
+The *development console* in the [web application](https://unisave.cloud/app/) is a useful tool during development.
 
-Unity loads the scene, runs the `Start` method and then a *facet call* is performed. However a *facet* has to always be called on behalf of some player. Someone has to be logged in. But noone is.
+<img src="img/workflow_development-console.png" style="border: 1px solid #aaa">
 
-Unisave detects this and does two things:
+It shows you the most recent requests made so you can inspect them to see what is happening. It also shows the list of uploaded backends so you can diagnose problems with backend uploading and see any server-compilation errors. But most importantly, the green button on the left gives you access to the *editor assigned database* - the database that your Unity editor talks to:
 
-First it starts server emulation.
+<img src="img/workflow_aardvark.png">
 
-<img src="img/workflow_emulation-warning.png">
-
-This is because it thinks we are developing the game and we don't actually want it to communicate with the real server. Emulation runs all the backend logic locally, against an in-memory database that you can easily inspect. That makes debugging much easier.
-
-Emulated database can be viewed through *uniarchy* (Unisave hierarchy), just open `Window > Unisave > Uniarchy`:
-
-<img src="img/workflow_uniarchy.png">
-
-Second thing that happens is that a player will be automatically logged in.
-
-<img src="img/workflow_autologin-warning.png">
-
-This is precisely because we need a player logged in in order for *facet calls* to even work. The player for auto-login can be specified in Unisave preferences:
-
-<img src="img/workflow_autologin-preferences.png">
-
-This player will even be automatically registered, if not present in the database.
-
-
-<a name="run-against-the-real-server"></a>
-## Run against the real server
-
-When you develop significant part of your game and you test against the emulated databse, you can try to run against the real one.
-
-You however need a login scene present. You can use the login form prefab to get started quickly. This is explained in detail in the [authentication section](authentication).
-
-Then you simply run Unity on your login scene and everything will work just like it did against the emulated server. Only now you can see the entities in the [web application](https://unisave.cloud/app).
+Unisave uses the [ArangoDB](https://www.arangodb.com/) database for storing your game data. The interface in the image above is part of the ArangoDB and it's called Aardvark. You can easily view, modify, query, and delete data using Aardvark. This will help you with debugging your backend logic but it also allows you to extract additional information from the data (like obtaining email addresses of most loyal players).

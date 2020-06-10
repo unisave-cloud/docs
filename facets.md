@@ -6,7 +6,6 @@
     - [Return value](#return-value)
     - [Exceptions](#exceptions)
     - [`await` calls](#await-calls)
-- [`Caller` property](#caller-property)
 - [Multiple return values](#multiple-return-values)
 
 Facet is a class, whose public methods can be called remotely from your game client. Each one of these methods usually handles a player request that queries or modifies the database (e.g. player buys an item).
@@ -72,9 +71,9 @@ public class MyScript : MonoBehaviour
 }
 ```
 
-You can notice, that it's not exactly like calling an ordinary method. This is because of the time it takes for the call to complete. It may take hundreds of milliseconds, depending on the internet connection so you cannot wait, because your game would freeze. Instead, you register a callback using the `.Then(...)` method, that will be called once.
+You can notice, that it's not exactly like calling an ordinary method. This is because of the time it takes for the call to complete. It may take hundreds of milliseconds, depending on the internet connection so you cannot wait, because your game would freeze. Instead, you register a callback using the `.Then(...)` method, that will be called once the response is received.
 
-It's usually more convenient to use a lambda function for the callback:
+It's usually more convenient to use a lambda expression for the callback:
 
 ```cs
 OnFacet<HomeFacet>
@@ -207,39 +206,6 @@ catch (PlayerAlreadyWaitingException)
 ```
 
 
-<a name="caller-property"></a>
-## `Caller` property
-
-When you write a facet method, you often need to know, what player called the method (what player is logged in on the game client). For this reason, you have the `this.Caller` property inherited from the `Facet` class:
-
-```cs
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unisave;
-
-public class ShopFacet : Facet
-{
-    /// <summary>
-    /// Player wants to buy fuel for their car
-    /// </summary>
-    public void BuyFuel()
-    {
-        var playerEntity = GetEntity<PlayerEntity>
-            .OfPlayer(Caller) // *HERE* we use the property
-            .First();
-
-        if (playerEntity.Coins < 100)
-            throw new NotEnoughMoneyException();
-
-        playerEntity.Coins -= 100;
-        playerEntity.Fuel += 50;
-        playerEntity.Save();
-    }
-}
-```
-
-
 <a name="multiple-return-values"></a>
 ## Multiple return values
 
@@ -263,21 +229,21 @@ public class GarageFacet : Facet
     }
 
     /// <summary>
-    /// Player enters the garage, so it has to be loaded
+    /// Player enters the garage so it has to be loaded
     /// </summary>
     public GarageData LoadGarage()
     {
-        return new GarageData {
-            playerEntity = GetEntity<PlayerEntity>
-                .OfPlayer(Caller)
-                .First(),
+        PlayerEntity player = Auth.GetPlayer<PlayerEntity>();
 
-            motorbikes = GetEntity<MotorbikeEntity>
-                .OfPlayer(Caller)
+        return new GarageData {
+            playerEntity = player,
+
+            motorbikes = DB.TakeAll<MotorbikeEntity>()
+                .Filter(m => m.Owner == player)
                 .Get(),
 
-            achievementsEntity = GetEntity<AchievementsEntity>
-                .OfPlayer(Caller)
+            achievementsEntity = DB.TakeAll<AchievementsEntity>()
+                .Filter(a => a.Owner == player)
                 .First() ?? AchievementsEntity.Empty
         };
     }

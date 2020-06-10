@@ -5,8 +5,6 @@
 - [Data](#data)
 - [Where to go next](#where-to-go-next)
 
-Unisave is a service providing backend server for games, targeting Unity engine and C# language.
-
 
 <a name="server-logic"></a>
 ## Server logic
@@ -43,7 +41,7 @@ public class HomeFacet : Facet
 <a name="calling-server-methods"></a>
 ## Calling server methods
 
-Of course, there needs to be some `MonoBehaviour` in the home scene that actually calls the facet method:
+Of course, there needs to be some `MonoBehaviour` in the home scene that calls the facet method:
 
 ```cs
 using System;
@@ -69,9 +67,9 @@ public class HomeSceneController : MonoBehaviour
 <a name="data"></a>
 ## Data
 
-What is this `PlayerEntity`? An *entity* is a collection of data that can be stored in the database.
+An *entity* is a collection of data that can be stored in a database.
 
-This `PlayerEntity` is defined as follows:
+The `PlayerEntity` seen above is defined as follows:
 
 ```cs
 using System;
@@ -91,7 +89,7 @@ public class PlayerEntity : Entity
 }
 ```
 
-Entities can be created, saved, modified and deleted by the server code. They can also be sent to the client and read.
+Entities can be created, saved, modified, and deleted by the server code. They can also be sent to the client and read.
 
 
 <a name="where-to-go-next"></a>
