@@ -10,7 +10,7 @@ Unisave provides two main features to you game:
 - Database for storing any data, accessible from anywhere
 - Platform for running some of your game logic in the cloud
 
-> IMAGE HERE
+<img src="img/features_overview.svg">
 
 The database lets you store little pieces of data called *entities*. An entity could represent a player, an achievement, an item in the game or it could store more abstract data like your leaderboards, game events, metrics. An entity is analogous to a row in a relational database or a document in a NoSQL database but it is designed to interface nicely with the C# code in your game. See the chapter on [entities](entities) to learn more.
 
@@ -22,12 +22,8 @@ You can create *facets* which are sets of methods that live in the cloud, can ac
 **Leaderboards**<br>
 Leaderboards can be easily built on top of Unisave. One entity for storing the top few players and their score and a facet that can add a new record and send the leaderboards table to the client. You can implement any behaviour you need. Player registration is not required. Ranking all players into a list by their score is a bit more challenging due to the number of players, but definitely possible with a bit of software engineering.
 
-> IMAGE (leaderboard)
-
 **Player registration and authentication**<br>
 You can easily register players, allow them to log in, reset passwords, and more. This is a core feature of any modern game since a player doesn't lose their progress when their computer breaks down. Also playing with your friends is way more fun than playing alone.
-
-> IMAGE (login form)
 
 **Matchmaking**<br>
 Many real-time multiplayer services provide matchmaking but oftentimes you need to match players according to their skill or mix-in bots when the traffic is low. These advanced features can be achieved with Unisave since you can implement any matchmaking logic you need.
@@ -36,12 +32,10 @@ Many real-time multiplayer services provide matchmaking but oftentimes you need 
 Maybe your game does not use Steam because it's a WebGL game but you still want to preserve the achievements of your players. Simply store the list of acquired achievements in an entity in the database.
 
 **In-game economy**<br>
-Remembering how many coins a player has is as simple as adding a single integer attribute to the player entity. But you go beyond that. Create auction hauses, bank vaults, or let the players mail coins to their friends.
+Remembering how many coins a player has is as simple as adding a single integer attribute to the player entity. But you can go beyond that. Create auction hauses, bank vaults, or let the players mail coins to their friends.
 
 **Extract information from the database**<br>
 How many players leave before obtaining the first achievement? What portion of players makes an in-game purchase? There are many insights hidden in your database and you dig them up using the [AQL query language](https://www.arangodb.com/docs/stable/aql/).
-
-> IMAGE of an AQL query to obtain emails of premium players
 
 **Separate development, testing, and production**<br>
 Create an additional database for testing the new version of your game to make sure you don't accidentally corrupt your live database. Redirect game builds to different databases or prevent old builds from connecting.
