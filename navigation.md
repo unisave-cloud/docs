@@ -1,6 +1,8 @@
 
 ### Getting started
 
+[Features](features)
+
 [Installation](installation)
 
 [Introduction](introduction)
