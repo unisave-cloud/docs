@@ -10,85 +10,83 @@
     - [Entity IDs](#entity-ids)
     - [Find by ID](#find-by-id)
     - [Timestamps](#timestamps)
-- [Entities belong to players](#entities-belong-to-players)
-    - [Add owner](#add-owner)
-    - [Remove owner](#remove-owner)
-    - [Partial ownership knowledge](#partial-ownership-knowledge)
-    - [Owner testing](#owner-testing)
-    - [Owner enumeration](#owner-enumeration)
 - [Entity queries](#entity-queries)
-    - [Retrieving all entities of given type](#retrieving-all-entities-of-given-type)
+    - [Retrieving all entities of a given type](#retrieving-all-entities-of-given-type)
     - [Retrieving the first entity](#retrieving-the-first-entity)
-    - [Querying by owners](#querying-by-owners)
-    - [Where clauses](#where-clauses)
-    - [More complex filtering](#more-complex-filtering)
+    - [Filter clause](#filter-clause)
 - [Singleton entities](#singleton-entities)
+- [Entity references](#entity-references)
+
+<!--
 - [Transactions](#transactions)
     - [Manual transactions](#manual-transactions)
 - [Locks](#locks)
     - [Lock for update](#lock-for-update)
     - [Shared lock](#shared-lock)
     - [Deadlocks](#deadlocks)
+-->
 
 
 <a name="introduction"></a>
 ## Introduction
 
-Unisave database holds only two kinds of objects: players and entities. Players obviously represent players of your game and are represented by the `UnisavePlayer` class. Entities on the other hand can represent anything you want.
-
-Entity is basically just a fancy C# class, that has the ability to be saved and then later loaded.
-
-Entity has also the option of belonging to some players, which allows it to be easily queried.
+An *entity* is a small collection of data that can be stored in the database. It's analogous to a row in a relational database or a document in a NoSQL database, however, it has some additional benefits. Each entity has a type that determines its attributes and each attribute holds the actual data. Entities are designed to interface neatly with the C# source code of your game.
 
 
 <a name="declaration"></a>
 ## Declaration
 
-Inside your `Backend/Entities` folder right click and choose `Create > Unsiave > Entity`. Type in the entity name `PlayerEntity`. A file with the following content will be created:
+Inside your `Backend/Entities` folder right-click and choose `Create > Unsiave > Entity`. Type in the entity name `PlayerEntity`. A file with the following content will be created:
 
 ```cs
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unisave;
+using Unisave.Entities;
+using Unisave.Facades;
 
 public class PlayerEntity : Entity
 {
     /// <summary>
     /// Replace this with your own entity attributes
     /// </summary>
-    [X] public string MyAttribute { get; set; } = "Default value";
+    public string myAttribute = "Default value";
 }
 ```
 
-This file is a specification of a new entity type. You specify an attribute by creating a public property and adding the `[X]` marking to it. This marking is important since it tells Unisave to preserve this exact property. Without this mark, it would be just a regular C# property.
+The created class describes the structure of a new entity. Each public field or property represents a value that will be stored in the database. The entity is also a regular C# class so you can add methods and private fields to it.
 
-An entity is also just another class, so you can add fields and methods as you like.
+> **Note:** A public property has to have both a public getter and a public setter, otherwise it won't be saved.
 
-So an entity that holds data about a player might look like this:
+> **Note:** You can use either properties or fields, this is up to you.
+
+We can add attributes to the newly created entity to make it represent a player:
 
 ```cs
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unisave;
+using Unisave.Entities;
+using Unisave.Facades;
 
 public class PlayerEntity : Entity
 {
     /// <summary>
     /// Player name displayed to other players
     /// </summary>
-    [X] public string Name { get; set; }
+    public string name;
 
     /// <summary>
     /// Number of coins owned
     /// </summary>
-    [X] public int Coins { get; set; }
+    public int coins;
 
     /// <summary>
     /// When will the premium account expire (or has expired)
     /// </summary>
-    [X] public DateTime PremiumUntil { get; set; } = DateTime.UtcNow;
+    public DateTime premiumUntil = DateTime.UtcNow;
 }
 ```
 
@@ -100,44 +98,44 @@ public class PlayerEntity : Entity
 <a name="create"></a>
 ### Create
 
-To create a new entity, simply create new instance and save it into the database:
+To create a new entity in the database, create new instance of the entity class and save it:
 
 ```cs
-var playerEntity = new PlayerEntity {
-    Name = "John",
-    Coins = 200
+var player = new PlayerEntity {
+    name = "John",
+    coins = 200
 };
 
-playerEntity.Save();
+player.Save();
 ```
 
-> **Warning:** `Save()` method might only be called from server code.
+> **Warning:** The `Save()` method might only be called from server code (e.g. inside facets).
 
 
 <a name="update"></a>
 ### Update
 
-To modify any entity, you just set the corresponding attributes and save:
+To modify any entity, you modify the corresponding attributes and call save:
 
 ```cs
-playerEntity.PremiumUntil = DateTime.UtcNow.AddDays(30);
+player.premiumUntil = DateTime.UtcNow.AddDays(30);
 
-playerEntity.Save();
+player.Save();
 ```
 
 
 <a name="delete"></a>
 ### Delete
 
-An entity can be deleted from the database by calling `Delete` on it:
+An entity can be deleted from the database by calling `Delete()` on it:
 
 ```cs
 someEntity.Delete();
 ```
 
-The method returns `true`, if the entity has been actually deleted and `false` if it wasn't in the database to begin with (someone might have deleted it before us).
+The `Delete()` method returns `true` if the entity has been actually deleted and `false` if it wasn't in the database, to begin with (someone might have deleted it before us).
 
-> **Warning:** Make sure you don't use the entity instance after you call `Delete`. Unisave does not guarantee corectness of the instance state. Simply throw it away.
+> **Warning:** Make sure you don't use the entity instance after you call `Delete()`. Unisave does not guarantee corectness of the instance state. Simply throw it away.
 
 
 <a name="refresh"></a>
@@ -146,49 +144,49 @@ The method returns `true`, if the entity has been actually deleted and `false` i
 To pull the latest entity data from the database, use the `Refresh()` method:
 
 ```cs
-playerEntity.Name = "Steve";
+player.Name = "Steve";
 
-playerEntity.Refresh();
+player.Refresh();
 
-playerEntity.Name; // "John"
+player.Name; // "John"
 ```
 
 
 <a name="entity-ids"></a>
 ### Entity IDs
 
-Each entity instance that is saved in the database has a unique string identifier. You can obtain this identifier as follows:
+Each entity in the database has a unique string identifier. You can obtain this identifier as follows:
 
 ```cs
-string id = playerEntity.EntityId;
+string id = player.EntityId;
 ```
 
-If the entity has been created and not yet saved, it is not present in the database, so the `EntityId` will be `null`.
+An entity that hasn't been saved yet has the `EntityId` set to `null` (because it isn't in the database).
 
 
 <a name="find-by-id"></a>
 ### Find by ID
 
-When we have an ID of an entity, we can find it in the database:
+We can find an entity in the database by its ID:
 
 ```cs
-var playerEntity = GetEntity<PlayerEntity>.Find(id);
+var player = DB.Find<PlayerEntity>(id);
 ```
 
-If entity with given ID does not exist, `null` will be returned.
+If no such entity is found, `null` will be returned.
 
 
 <a name="timestamps"></a>
 ### Timestamps
 
-An entity also automatically keeps track of two timestamps: `CreatedAt` and `UpdatedAt`.
+Each entity automatically keeps track of two timestamps: `CreatedAt` and `UpdatedAt`.
 
 ```cs
 DateTime createdAt = someEntity.CreatedAt;
 DateTime updatedAt = someEntity.UpdatedAt;
 ```
 
-`CreatedAt` is set when `Save` is called for the first time.
+`CreatedAt` is set when the `Save` method is called for the first time.
 
 `UpdatedAt` is set each time you call the `Save` method.
 
@@ -196,397 +194,196 @@ Both values are set to immediate `DateTime.UtcNow`.
 
 > **Note:** When the entity is not yet stored in the database, timestamps have no meaningful value.
 
-> **Note:** It's recommended that you use UTC time throughout Unisave and then convert to local time only on the client-side when displaying time to the player. This is because your game is most likely to be distributed around the world into multiple timezones, so you need to keep the values consistent.
-
-
-<a name="entities-belong-to-players"></a>
-## Entities belong to players
-
-An entity can have a set of owners (players), that makes it much easier to access the entity.
-
-For example the `PlayerEntity` from above logically belongs to a single player. We want to capture that fact and use it later on to query the entity.
-
-You might have entities without any owners. Those are called *game entities* and the example would be a `MatchmakerEntity` holding list of waiting players or a `LeaderboardEntity`.
-
-An entity can belong to a single player (called *player entities*), e.g. the `PlayerEntity` holding general data about a player or `MotorbikeEntity` that describes a motorbike the player might own.
-
-There might also be entities belonging to multiple players (called *shared entities*), like `TeamEntity` representing a team of players or `MatchEntity` representing a single match (game / battle / race).
-
-Summary of this idea is captured in the diagram below:
-
-<img src="img/new-cloud_the-database.svg">
-
-
-<a name="add-owner"></a>
-### Add owner
-
-Owners are managed through the `Owners` property on an entity.
-
-To add new owner, just call `Owners.Add(player)` and save the entity:
-
-```cs
-using System.Collections;
-using System.Collections.Generic;
-using Unisave;
-
-public class InitializeFreshPlayer : PlayerRegistrationHook
-{
-    /// <summary>
-    /// Execution order against other registration hooks
-    /// </summary>
-    public override int Order => 1;
-
-    /// <summary>
-    /// This method gets executed during registration of new players
-    /// </summary>
-    public override void Run()
-    {
-        var playerEntity = new PlayerEntity();
-
-        playerEntity.Owners.Add(this.Player);
-
-        playerEntity.Save();
-    }
-}
-```
-
-If the player is already present, nothing happens.
-
-
-<a name="remove-owner"></a>
-### Remove owner
-
-Removing a player is almost the same as addition:
-
-```cs
-someEntity.Owners.Remove(player);
-
-someEntity.Save();
-```
-
-
-<a name="partial-ownership-knowledge"></a>
-### Partial ownership knowledge
-
-Since an entity might have a lot of owners (think a large player guild or alliance), not all owners are pulled from the database when an entity is pulled. This poses no problems when adding or removing owners, but it does when you test or query owners of an entity.
-
-Server-side code has the advantage of having the database nearby, so it can run a query silently so you don't really need to worry about this. Client-side however needs to be aware of this problem.
-
-Completeness of information indicates the `IsComplete` property:
-
-```cs
-if (someEntity.Owners.IsComplete)
-{
-    someEntity.Owner.Count;
-
-    someEntity.Owner.Contains(player);
-
-    foreach (UnisavePlayer owner in someEntity.Owner)
-    {
-        //
-    }
-}
-```
-
-> **Note:** When an entity is pulled from database, at least one owner will be pulled, but it is not guaranteed, so you shouldn't rely on it.
-
-> **Todo:** Add a method to pull all owners to complete the information.
-
-
-<a name="owner-testing"></a>
-### Owner testing
-
-You can test whether a player is an owner of a given entity:
-
-```cs
-someEntity.Owners.Contains(player); // true | false
-```
-
-Since the ownership may not be known, this method will query the database when needed. If such situation happens on the client side, `InvalidOperationException` will be thrown.
-
-If you want to prevent the exception or database access, you can just try to get the result:
-
-```cs
-bool? contains = someEntity.Owners.TryContains(player); // may be null
-```
-
-
-<a name="owner-enumeration"></a>
-### Owner enumeration
-
-When you want to go through all the owners, just use a foreach loop:
-
-```cs
-foreach (UnisavePlayer owner in someEntity.Owners)
-{
-    //
-}
-```
-
-This however is missing proper implementation and it throws `InvalidOperationException` even if the data could be pulled from the database.
-
-> **Todo:** Try to pull owners when enumerating and the information is not complete.
+> **Note:** It is a good idea to use unisavesal coordinated time (UTC) throughout your game and convert it to local time only when displaying it to the player. This is because your game will most likely be distributed around the world over multiple timezones and this approach makes is easy to deal with.
 
 
 <a name="entity-queries"></a>
 ## Entity queries
 
-Entities can be queried from the database by the server-side code using the `GetEntity<T>` facade.
-
-Understand, that this can not be done on the client-side, because the database is not accessible there.
+Entities can be queried from the database by the server-side code using the `GetEntity<T>` facade. Understand that this can not be done on the client-side because the database is not accessible there.
 
 
 <a name="retrieving-all-entities-of-given-type"></a>
-### Retrieving all entities of given type
+### Retrieving all entities of a given type
 
-The simplest query is to get all entities of a given type:
+The following query returns all the leaderboards:
 
 ```cs
-List<MotorbikeConfigEntity> entities = GetEntity<MotorbikeConfigEntity>.Get();
+List<LeaderboardEntity> leaderboards = DB.TakeAll<LeaderboardEntity>().Get();
 ```
-
-> **Note:** This query will match *game entities* only. Meaning they have no owners.
 
 
 <a name="retrieving-the-first-entity"></a>
 ### Retrieving the first entity
 
-Sometimes we know, that there's going to be at most one instance of some entity in the database. In that case it's easier to ask for only that one entity, rather then a list:
+When we know, there is only a single result to be returned, we can ask for the only result:
 
 ```cs
-MatchmakerEntity matchmakerEntity = GetEntity<MatchmakerEntity>.First();
+MatchmakerEntity matchmaker = DB.TakeAll<MatchmakerEntity>().First();
 ```
 
 If no such entity exists, `null` will be returned.
 
-> **Note:** This query will match *game entities* only. Meaning they have no owners.
-
-> **Warning:** Make sure you don't use the `First` method when you suspect that multiple entities might match the query, because the entity that will be chosen is picked at random.
+> **Warning:** Make sure you don't use the `First` method when you suspect that multiple entities might match the query because the entity that will be chosen is picked at random.
 
 
-<a name="querying-by-owners"></a>
-### Querying by owners
+<a name="filter-clause"></a>
+### Filter clause
 
-Primary reason, why entity owners exist is to make querying much simpler and faster.
+We can filter out player with active premium account using the `Filter` clause:
 
-To query a *player entity* belonging to a specific player, use the `OfPlayer` method:
+```cs
+var premiumPlayers = DB.TakeAll<PlayerEntity>()
+    .Filter(p => p.premiumUntil > DateTime.UtcNow)
+    .Get();
+```
+
+When registering a new player, you might want to check the email address availability:
 
 ```cs
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unisave;
+using Unisave.Facets;
+using Unisave.Facades;
 
-public class PlayerFacet : Facet
+public class AuthFacet : Facet
 {
     /// <summary>
-    /// Returns information about the logged-in player
+    /// Registers a new player
     /// </summary>
-    public PlayerEntity GetPlayerEntity()
+    public bool Register(string email, string password)
     {
-        return GetEntity<PlayerEntity>
-            .OfPlayer(this.Caller)
+        var player = DB.TakeAll<PlayerEntity>()
+            .Filter(p => p.email == email)
             .First();
+        
+        if (player != null)
+            return false; // email address already registered
+        
+        // ... continue with registration ...
     }
 }
 ```
 
-Each query by default matches the provided set of owners exactly. This means, that when you don't specify any owners, only *game entities* will be matched.
-
-In the same manner, when you specify a single owner using the `OfPlayer` method, only *player entities* will be matched.
-
-When you want to query *shared entities* however, you typically want entities with additional owners as well. This can be specified by calling the `AndOthers` method:
+You can filter multiple times by repeating the `Filter` clause:
 
 ```cs
-var playerTeam = GetEntity<TeamEntity>
-    .OfPlayer(Caller)
-    .AndOthers()
-    .First();
-```
-
-When you want to query an entity and you don't care at all about the owners, you can use the `OfAnyPlayers` method. It has the same effect as `AndOthers`, but is easier to read:
-
-```cs
-var allMatches = GetEntity<MatchEntity>
-    .OfAnyPlayers()
+var wealthyPremiumPlayers = DB.TakeAll<PlayerEntity>()
+    .Filter(p => p.coins > 20_000)
+    .Filter(p => p.premiumUntil > DateTime.UtcNow)
     .Get();
 ```
 
-When you require two owners, you just chain the calls:
+But the filtration above could also be written using a single clause:
 
 ```cs
-var match = GetEntity<MatchEntity>
-    .OfPlayer(first)
-    .OfPlayer(second)
-    .First();
-```
-
-Or with many more, you can provide an enumerable to plural version of this method, which has the same effect:
-
-```cs
-var match = GetEntity<MatchEntity>
-    .OfPlayers(listOfPlayers)
-    .First();
-```
-
-> **Warning:** I'm using `First` in the example, but remember, that two players might have had multiple matches fought against each other. So really you should obtain all of them and get the latest one.
-
-
-<a name="where-clauses"></a>
-### Where clauses
-
-When you filter entities by owners, you can further filter by values of their attributes. Keep in mind, however, that this kind of filtering is significantly slower than filtering by owners.
-
-Say we want to get all players with premium accounts:
-
-```cs
-var premiumPlayers = GetEntity<PlayerEntity>
-    .OfAnyPlayers()
-    .Where("PremiumUntil", ">", DateTime.UtcNow)
+var wealthyPremiumPlayers = DB.TakeAll<PlayerEntity>()
+    .Filter(p => p.coins > 20_000 && p.premiumUntil > DateTime.UtcNow)
     .Get();
 ```
-
-Where clause consist of three parts:
-
-- **attribute path** - a path to the attribute to be tested. Valid paths would be: `"foo"`, `"foo.bar"`, `"foo[4].bar[0]"`, `"foo[\"bar\"]"`. Paths correspond to paths through the serialized JSON representation of the entity.
-- **operator** - one of the following operators: `=`, `<`, `>`, `<=`, `>=`, `<>`, `!=`. Equality operator can be omitted: `.Where("foo", 5)`
-- **constant value** - any value that should be used for the other side of the operator.
-
-When registering new player, you might want to check, that a given name is not used by anyone else:
-
-```cs
-using System.Collections;
-using System.Collections.Generic;
-using Unisave;
-
-public class VerifyNameUniqueness : PlayerRegistrationHook
-{
-    /// <summary>
-    /// Execution order against other registration hooks
-    /// </summary>
-    public override int Order => 1;
-
-    /// <summary>
-    /// This method gets executed during registration of new players
-    /// </summary>
-    public override void Run()
-    {
-        string providedName = GetArgument<string>("name");
-
-        var existingPlayer = GetEntity<PlayerEntity>
-            .OfAnyPlayers()
-            .Where("Name", providedName)
-            .First();
-
-        if (existingPlayer != null)
-            Reject("Name is already taken.");
-    }
-}
-```
-
-Applying multiple where clauses means that all have to be satisfied in order for an entity to be matched:
-
-```cs
-var wealthyPremiumPlayers = GetEntity<PlayerEntity>
-    .OfAnyPlayers()
-    .Where("Coins", ">", 20_000)
-    .Where("PremiumUntil", ">", DateTime.UtcNow)
-    .Get();
-```
-
-You can put clauses into disjunction by using the `OrWhere` method:
-
-```cs
-var nonAveragePlayers = GetEntity<PlayerEntity>
-    .OfAnyPlayers()
-    .Where("Coins", "<", 500)
-    .OrWhere("Coins", ">", 10_000)
-    .Get();
-```
-
-> **Todo:** Extend where clauses to timestamps (currently manual filtering is the only option).
-
-> **Todo:** Write tests for datetime comparisons (should work, but add it to the test suite).
-
-
-<a name="more-complex-filtering"></a>
-### More complex filtering
-
-You want to make a filter, that cannot be expressed with provided *where* clauses. Then you have no other option, but to do the filtering manually in memory:
-
-```cs
-using System.Linq;
-
-var crazyFiltered = GetEntity<SomeEntity>
-    .OfAnyPlayers()
-    .Where("foo", "bar") // efficient pre-filtering in the database
-    .GetEnumerable() // like Get(), but better
-    .Where(e => e.EntityId.Contains("omg")) // linq filter in memory
-    .ToList();
-```
-
-When doing such things, you have to consider how many entities will actually be pulled from the database. If you pull all player entities, you make the query not only super slow, but you risk running out of memory when your player count goes up.
-
-Also note that you can replace `Get()` with `GetEnumerable()`. This does not cause constant memory usage however. It just offloads the buffering to Unisave, which can handle it in more careful way, but the memory problems might arise just as well.
-
-Working with the data post-query can be also used to sort the results, since ordering is not yet supported.
-
-> **Todo:** Add result ordering into queries.
 
 
 <a name="singleton-entities"></a>
 ## Singleton entities
 
-Oftentimes you have an entity (usually a *game entity*) that should exist only once in the entire database. Such entity is called a *singleton entity*.
-
-You want to create the entity the first time you need it, and then just query it.
-
-Rather then copying this logic everywhere you need this entity, it's better to extract it into the entity class itself:
+There are some entities that exist only in one instance (one leaderboard, one matchmaker). There is a convenient method `FirstOrCreate` that simplifies working with such entities:
 
 ```cs
 using System;
-using System.Collections.Generic;
 using Unisave;
+using Unisave.Facets;
+using Unisave.Facades;
 
-public class LeaderboardEntity : Entity
+public class LeaderboardFacet : Facet
 {
-    public static BoardRecord
+    /// <summary>
+    /// Sends the leaderboard to the game client
+    /// </summary>
+    public LeaderboardEntity GetLeaderboard()
     {
-        public int rating;
-        public UnisavePlayer player;
+        return DB.FirstOrCreate<LeaderboardEntity>();
     }
 
-    [X] public List<BoardRecord> Board { get; set; }
-        = new List<BoardRecord>();
-
     /// <summary>
-    /// Gets the singleton instance and returns it
+    /// Adds a new record to the leaderboard
     /// </summary>
-    public static LeaderboardEntity Get()
+    public void AddRecord(string playerName, int score)
     {
-        var entity = GetEntity<LeaderboardEntity>.First();
+        var leaderboard = DB.FirstOrCreate<LeaderboardEntity>();
 
-        if (entity == null)
-        {
-            entity = new LeaderboardEntity();
-            entity.Save();
-        }
+        leaderboard.Add(playerName, score); // some smart logic inside
 
-        return entity;
+        leaderboard.Save();
     }
 }
 ```
 
-Then when you actually need the entity, you just call the static method:
+The entity will be created the first time it is needed and then it will only be loaded over and over again.
+
+You might also want to have an entity containing player achievements. One player always has only one achievements entity:
 
 ```cs
-var leaderboard = LeaderboardEntity.Get();
+var achievements = DB.TakeAll<AchievementsEntity>()
+    .Filter(a => a.owner == player)
+    .FirstOrCreate(a => {
+        // here we can initialize the new entity
+        a.owner = player;
+    });
 ```
 
-This is not something you have to use, it's just a pattern that might be useful.
 
-Also *player entities* are often singletons (relative to a player), but they are usually created during player registration, so there's not the problem that they are not present in the database.
+<a name="entity-references"></a>
+## Entity references
 
+Entities can contain references to other entities, which lets you build more complex systems. Say a player owns multiple motorbikes - we can capture this fact with references:
+
+```cs
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using Unisave;
+using Unisave.Entities;
+using Unisave.Facades;
+
+public class MotorbikeEntity : Entity
+{
+    /// <summary>
+    /// Motorbike has an owner
+    /// </summary>
+    public EntityReference<PlayerEntity> owner;
+
+    // ... other attributes ...
+}
+```
+
+When no owner is assigned, the reference contains `null`. We can create a new motorbike and give it an owner:
+
+```cs
+var player = Auth.GetPlayer<PlayerEntity>();
+
+var motorbike = new MotorbikeEntity() {
+    owner = player
+};
+motorbike.Save();
+```
+
+Now we can ask for all the motorbikes a player has:
+
+```cs
+var motorbikes = DB.TakeAll<MotorbikeEntity>()
+    .Filter(m => m.owner == player)
+    .Get();
+```
+
+Or we can get the owner of a given motorbike:
+
+```cs
+PlayerEntity player = motorbike.owner.Find();
+```
+
+Again, the owner can be `null` if the reference points nowhere.
+
+
+<!--
 
 <a name="transactions"></a>
 ## Transactions
@@ -774,3 +571,5 @@ DB.Transaction(() => {
     // ...
 }, 5);
 ```
+
+-->
