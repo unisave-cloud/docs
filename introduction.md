@@ -29,10 +29,10 @@ public class HomeFacet : Facet
     {
         // obtain authenticated player ID from the session
         // and load player data from the database
-        PlayerEntity entity = Auth.GetPlayer<PlayerEntity>();
+        PlayerEntity player = Auth.GetPlayer<PlayerEntity>();
 
         // send the data back to the game client
-        return entity;
+        return player;
     }
 }
 ```
@@ -57,8 +57,8 @@ public class HomeSceneController : MonoBehaviour
                 nameof(HomeFacet.GetPlayerEntity)
             );
 
-        Debug.Log("Player: " + player.Nickname);
-        Debug.Log("Coins: " + player.Coins);
+        Debug.Log("Player: " + player.nickname);
+        Debug.Log("Coins: " + player.coins);
     }
 }
 ```
@@ -80,12 +80,12 @@ public class PlayerEntity : Entity
     /// <summary>
     /// Name displayed to other players
     /// </summary>
-    public string Nickname { get; set; }
+    public string nickname;
 
     /// <summary>
     /// Number of coins owned
     /// </summary>
-    public int Coins { get; set; }
+    public int coins;
 }
 ```
 

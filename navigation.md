@@ -16,7 +16,7 @@
 
 [Entities](entities)
 
-[<span style="opacity: 0.5">Authentication</span>](authentication)
+[Authentication](authentication)
 
 
 ### Modules
