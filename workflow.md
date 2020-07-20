@@ -2,7 +2,7 @@
 
 - [Backend folder](#backend-folder)
 - [Backend uploading](#backend-uploading)
-- [Web development board](#web-development-board)
+- [Development console](#development-console)
 
 
 <a name="backend-folder"></a>
@@ -25,8 +25,8 @@ The `Backend` folder is located inside your Unity project. It needs to get to th
 <img src="img/workflow_backend-uploading.png">
 
 
-<a name="web-development-board"></a>
-## Web development board
+<a name="development-console"></a>
+## Development console
 
 The *development console* in the [web application](https://unisave.cloud/app/) is a useful tool during development.
 
