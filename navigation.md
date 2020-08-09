@@ -16,16 +16,25 @@
 
 [Entities](entities)
 
+[Environments](environments)
+
 [Authentication](authentication)
 
 
+### Templates
+
+[Overview](templates)
+
+[Steam microtransactions](steam-microtransactions)
+
+<!--
 ### Modules
 
 [Overview](modules)
 
 [<span style="opacity: 0.5">Matchmaker</span>](matchmaker)
 
-<!--
+!--
 [Leaderboards](leaderboards)
 -->
 
