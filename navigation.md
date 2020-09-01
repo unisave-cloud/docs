@@ -16,14 +16,18 @@
 
 [Entities](entities)
 
-[Environments](environments)
-
 [Authentication](authentication)
+
+[Environments](environments)
 
 
 ### Templates
 
 [Overview](templates)
+
+[Email authentication](email-authentication)
+
+[Steam authentication](steam-authentication)
 
 [Steam microtransactions](steam-microtransactions)
 
@@ -41,8 +45,8 @@
 
 ### Advanced
 
-<!--
-[Backends & databases](backends-and-databases)
--->
+[HTTP Client](http-client)
+
+[Mail](mail)
 
 [Serialization](serialization)

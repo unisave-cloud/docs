@@ -5,6 +5,7 @@
 - [Instantiating the template](#instantiating-the-template)
 - [Describing products](#describing-products)
 - [Making a transaction](#making-a-transaction)
+- [Problems with Unity editor and Steam overlay](#problems-with-unity-editor-and-steam-overlay)
 - [Staying up-to-date](#staying-up-to-date)
 
 Steam allows you to make transactions from within your game but it requires you to have a secure backend server to validate and perform the purchases. This template lets you quickly and elegantly integrate Steam microtransactions into your game.
@@ -18,8 +19,8 @@ You should have a Steam developer account and a basic understanding of how Steam
 > **TL;DR of how Steam microtransactions work**
 > 1. Player clicks "buy this gold pack".
 > 2. Your *game client* tells your *purchasing server* (part of your backend server) that the Steam user `123` wants to buy the product `xyz` for `$999`.
-> 3. Your *purchasing server* tells the same thing to Steam but adds your `App ID` and publisher key.
-> 4. Steam will perform the checkout process with the player.
+> 3. Your *purchasing server* tells the same thing to Steam but adds your `App ID` and [publisher key](https://partner.steamgames.com/doc/webapi_overview/auth).
+> 4. Steam will perform the checkout process with the player using [Steam overlay](https://partner.steamgames.com/doc/features/overlay) displayed over your running game.
 > 5. Steam will notify your *game client* (via a Steamworks callback), that the transaction was authorized / aborted.
 > 6. Your *game client* will tell your *purchasing server* to finalize the transaction.
 > 7. Your *purchasing server* will finalize the transaction and give the purchased products to the player.
@@ -30,7 +31,10 @@ You should have a Steam developer account and a basic understanding of how Steam
 > How your backend communicates with Steam:
 > https://partner.steamgames.com/doc/webapi/ISteamMicroTxn#InitTxn
 
-Your Unity game needs to communicate with the Steam application. This is done using the library [Steamworks.NET](https://steamworks.github.io/). Install it by downloading the latest `.unitypackage` from https://github.com/rlabrecque/Steamworks.NET/releases
+Your Unity game needs to communicate with the Steam application. This is done using the library [Steamworks.NET](https://steamworks.github.io/):
+
+1. Install it by downloading the latest `.unitypackage` from https://github.com/rlabrecque/Steamworks.NET/releases
+2. Set it up properly (set up the `steam_appid.txt`, and create the `SteamManager`), see https://steamworks.github.io/installation/
 
 
 <a name="environment-variables"></a>
@@ -45,7 +49,7 @@ STEAM_PUBLISHER_KEY=secret
 STEAM_USE_MICROTRANSACTION_SANDBOX=false
 ```
 
-You need to specify your App ID and publisher web API key. The Steam API URL is set at a sensible default and the last `STEAM_USE_MICROTRANSACTION_SANDBOX` specifies whether to use the [testing sandbox that Steam provides](https://partner.steamgames.com/doc/webapi/ISteamMicroTxnSandbox) when making transaction requests.
+You need to specify your App ID and [publisher web API key](https://partner.steamgames.com/doc/webapi_overview/auth). The Steam API URL is set to a sensible default and the last `STEAM_USE_MICROTRANSACTION_SANDBOX` specifies whether to use the [testing sandbox that Steam provides](https://partner.steamgames.com/doc/webapi/ISteamMicroTxnSandbox) when making transaction requests.
 
 
 <a name="instantiating-the-template"></a>
@@ -68,6 +72,10 @@ Backend/
 - `SteamTransactionEntity.cs` is an entity that is created for each transaction, successful or not.
 
 Next we need a script that will communicate with the *purchasing server* and Steamworks.NET within your game. Go to your `Scripts` folder, right-click and choose `Create > Unisave > Steam microtransactions > Client`. This will create a file named `SteamPurchasingClient.cs` that you will use when making transactions.
+
+> **Info:** The `SteamPurchasingClient` is indeed a client-side script and it does create entities on the client-side. The catch is that they are not saved there. They are saved on the server-side, where the database is accessible.
+>
+> The virtual products are classes shared by both the client and the server so they need to be placed inside your `Backend` folder to be accessible on the server. But they can still be used and created on the client-side. This is the power of isomorfic code - one code to be used in both contexts.
 
 
 <a name="describing-products"></a>
@@ -124,6 +132,24 @@ Add this script into your scene and hook a button to call the `PlayerClickedBuy`
 There are two more methods that you should implement, `TransactionHasBeenSuccessful` and `ReportErrorToThePlayer`. In both of them you should display a corresponding dialog window to the player. See the code inside of them to learn more.
 
 Lastly, when a transaction succeeds and products are given to the player, the player data have been updated only on the server. You should use the `TransactionHasBeenSuccessful` method to load the latest player data from the server so that the player sees the newly purchased items.
+
+
+<a name="problems-with-unity-editor-and-steam-overlay"></a>
+## Problems with Unity editor and Steam overlay
+
+When you hit play in your Unity editor and try to make a transaction, it will probably fail with:
+
+    Steam rejected transaction initiation.
+    [7] User 123456789 not logged in
+    Order ID: 123456789
+
+This is because your Steam client thinks your game isn't running and rejects the transaction. Trying to make a transaction from a build that's launched directly (not via Steam client) might fail even earlier.
+
+**Basically the best thing you can do is to build your game, upload it to Steam, and launch it via the Steam client.** This will make sure Steam client attaches to your running game and all callbacks it sends will be received by your game.
+
+> **Tip:** You can use [Steam branches](https://partner.steamgames.com/doc/store/application/branches) to not interfere with your game client in production.
+
+The process described above should work because it is the same setup that will be used in production. However, if you don't want to wait for a complete build, you can launch your game from Steam (to make Steam think it's running), then hit play in your Unity editor and then make a transaction from the Unity editor. The purchasing overlay should open over your running game. The problem is that the callback with the result will not be received by the Unity editor so the transaction won't be finished. But you can at least test the transaction initiation.
 
 
 <a name="staying-up-to-date"></a>
