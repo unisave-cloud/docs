@@ -1,7 +1,7 @@
 # Authentication
 
 - [Player entity](#player-entity)
-- [Auth facet](#auth-facet)
+- [Authentication templates](#authentication-templates)
 - [Authenticated player](#authenticated-player)
 - [Guarding facets](#guarding-facets)
 - [Security](#security)
@@ -9,107 +9,60 @@
     - [Sensitive data leakage](#sensitive-data-leakage)
 - [Custom authentication](#custom-authentication)
 
+This documentation page is all about player registration and authentication. What templates will get you started quickly, how to protect certain facet methods from unauthorized players, and how to implement custom authentication.
+
 
 <a name="player-entity"></a>
 ## Player entity
 
-You have to create an entity that will represent your players whenever you want to authenticate your players. Unisave provides a nice template to get you started quickly. Go to your `Backend` folder, right-click, select `Create > Unisave > Auth > PlayerEntity`, and hit enter. The following file will be created:
+Players of your game are represented by an entity called `PlayerEntity`. Unisave provides template for this entity to get you started quickly. Go to your `Backend` folder, right-click, and select `Create > Unisave > PlayerEntity`. A file very simmilar to the following will be created:
 
 ```cs
-using System;
-using Unisave;
-using Unisave.Entities;
-
 public class PlayerEntity : Entity
 {
-    /// <summary>
-    /// Email of the player
-    /// </summary>
-    public string email;
+    // Add authentication via email:
+    // https://unisave.cloud/docs/email-authentication
+    //
+    //      public string email;
+    //      public string password;
+    //      public DateTime lastLoginAt = DateTime.UtcNow;
+    //
 
-    /// <summary>
-    /// Hashed password
-    /// </summary>
-    public string password;
+    // Add custom fields to the entity:
+    //
+    //      public string nickname;
+    //      public int coins = 1_000;
+    //      public DateTime premiumUntil = DateTime.UtcNow;
+    //      public DateTime bannedUntil = DateTime.UtcNow;
+    //
 }
 ```
 
-You may add any additional fields you want, like `name`, `coins`, `experience`, ...
+You will add new fields to this entity as you will need. If you have anonymous players, you would add some identification token. If you register and login via email, you add `email` and `password` fields. If you login via Steam, you add `steamId` field, etc...
+
+Apart from authentication fields, you may add any aditional fields important to your game. This might be some player preferences (nickname, favourite color, racing number) or resources (coins, gold, experience) or timestamps (premium account until, banned until, last login at), etc...
 
 
-<a name="auth-facet"></a>
-## Auth facet
+<a name="authentication-templates"></a>
+## Authentication templates
 
-Auth facet contains logic regarding player registration, login, and logout. Again, Unisave has a reasonable template for you. Go to your `Backend` folder, right-click, select `Create > Unisave > Auth > AuthFacet`, and hit enter. The following file will be created:
+Depending on the type of your game, you can use authentication templates to quickly set up player registration and login:
 
-```cs
-using System;
-using Unisave.Facades;
-using Unisave.Facets;
-using Unisave.Utils;
+**[Email authentication](email-authentication)**<br>
+This method is typical for web-browser-based games and some desktop games. You register via email, provide a password and use them to login later.
 
-public class AuthFacet : Facet
-{
-    public bool Login(string email, string password)
-    {
-        var player = FindPlayer(email);
+**[Steam authentication](steam-authentication)**<br>
+If you distribute your game via Steam, this authentication method is a no-brainer. Use it together with *Email authentication* by showing a `[Login via Steam]` button on the login form, or use it transparently in the background during game startup.
 
-        if (player == null)
-            return false;
+If none of these templates suit your needs, you can always implement [custom authentication method](#custom-authentication).
 
-        if (!Hash.Check(password, player.password))
-            return false;
-
-        Auth.Login(player);
-        return true;
-    }
-
-    public bool Logout()
-    {
-        bool wasLoggedIn = Auth.Check();
-        Auth.Logout();
-        return wasLoggedIn;
-    }
-    
-    public RegistrationResult Register(string email, string password)
-    {
-        // ... validation code ...
-        // return RegistrationResult.InvalidEmail;
-        // return RegistrationResult.WeakPassword;
-        // return RegistrationResult.EmailTaken;
-        
-        // register
-        var player = new PlayerEntity {
-            email = normalizedEmail,
-            password = Hash.Make(password)
-        };
-        player.Save();
-        
-        // login
-        Auth.Login(player);
-        
-        return RegistrationResult.Ok;
-    }
-
-    public enum RegistrationResult { /* ... */ }
-    
-    // ... helper methods ...
-}
-```
-
-The facet performs player registration by an email and a password. You can easily add player nicknames to the registration logic. The entire facet is built on top of the `Auth` facade about which you can read in the [custom authentication](#custom-authentication) section.
-
-Feel free to read the entire template and modify the code to fit your needs. The facet normalizes email addresses (meaning they are turned to lower-case and trimmed). This makes the login logic seem case-insensitive even though it isn't.
-
-> **Note:** The facet uses a case-sensitive email comparison to make sure a database index can be used for the lookup. This speeds up the login significantly.
-
-> **Note:** The lookup is performed twice - once with the email the player typed in and the second time with its lowercase variant. This ensures that an email address with upper-case characters in the database can still be logged into (for backward compatibility and general fool-proofing).
+With an authentication template installed, you can start treating authenticated players differently:
 
 
 <a name="authenticated-player"></a>
 ## Authenticated player
 
-You can ask for the currently authenticated player using the `Auth` facade:
+You can ask for the currently authenticated player using the `Auth.GetPlayer<PlayerEntity>()` method:
 
 ```cs
 using Unisave.Facades;
@@ -139,7 +92,7 @@ bool someoneIsLoggedIn = Auth.Check();
 <a name="guarding-facets"></a>
 ## Guarding facets
 
-There are many facets that should only be accessed by an authenticated player. You can enforce this condition by specifying an authentication middleware for the facet:
+Oftentimes you want only authenticated players to call facet methods. You can enforce this by specifying an authentication middleware for the facet:
 
 ```cs
 using Unisave.Facades;
@@ -165,15 +118,21 @@ The middleware declaration `[Middleware(typeof(Authenticate))]` can also be appl
 
 A `Unisave.Authentication.AuthException` will be raised whenever a non-authenticated game client tries to call a guarded facet method.
 
+> **Note:** It's not catastrophic to forget to add the middleware. Most methods that work with players first ask for the player via `Auth.GetPlayer<...>(...)` and since this method would return `null`, it will in turn cause a `NullReferenceException` to be thrown down the line. But it's not ideal and in some cases could be used to break into your server. So be safe and add the middleware.
+
 
 <a name="security"></a>
 ## Security
+
+> **\[ ! \]** This section talks about security. Read it all and carefully!
 
 
 <a name="password-hashing"></a>
 ### Password hashing
 
-When tinkering with the `AuthFacet` make sure you hash passwords before storing them. Hashing is an important technique that makes sure you don't store your player's passwords as-is. A hashed password is almost impossible to turn back to the original password so if you were to accidentally leak your database, your player's passwords wouldn't be compromised.
+Hashing is an important technique that makes sure you don't store player's passwords as-is. A hashed password is almost impossible to turn back to the original password so if you were to accidentally leak your database, your player's passwords wouldn't be compromised.
+
+**Just remember that anytime you access a `player.password` field, there's not really a plain password but its hash fingerprint.**
 
 Unisave provides utility functions in `Unisave.Utils.Hash` class that can help you with hashing:
 
@@ -198,7 +157,7 @@ Say you implement a matchmaker. Many players participate in a single match. Each
 
 Never trust your game client. It could have been disassembled and modified. It can call facets in a different order than you've anticipated. Trust only the server-side code (facets) - it cannot be tampered with.
 
-Even if a player would download their own player entity. They could have a virus-infected computer. They could have a cracked version of your game. Sensitive information should never leave the server.
+Even if a player would download their own player entity. They could have a virus-infected computer. They could have a cracked version of your game. **Sensitive information should never leave the server.**
 
 
 <a name="custom-authentication"></a>
@@ -213,11 +172,11 @@ There are a few methods used to query the currently authenticated player:
 bool someoneIsLoggedIn = Auth.Check();
 
 // Gets ID of the entity representing the authenticated player.
-// Null if nobody logged in.
+// Null if there's nobody logged in.
 string playerEntityId = Auth.Id();
 
 // Gets the entity representing the authenticated player.
-// Returns null if nobody logged in.
+// Null if there's nobody logged in.
 PlayerEntity player = Auth.GetPlayer<PlayerEntity>();
 ```
 

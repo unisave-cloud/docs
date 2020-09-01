@@ -155,11 +155,8 @@ The process described above should work because it is the same setup that will b
 <a name="staying-up-to-date"></a>
 ## Staying up-to-date
 
-The latest version of the Steam microtransactions template is `0.9.0`.
+The latest version of the *Steam microtransactions* template is `0.9.0`.
+
+For instructions on how to update, check out [the changelog and upgrade guide](https://github.com/Jirka-Mayer/UnisaveAsset/blob/master/Assets/UnisaveFixture/TemplateChangelogs/SteamMicrotransactions.md).
 
 You can view the latest template code on Github for [the backend part](https://github.com/Jirka-Mayer/UnisaveAsset/tree/master/Assets/UnisaveFixture/Backend/SteamMicrotransactions) and [the client](https://github.com/Jirka-Mayer/UnisaveAsset/blob/master/Assets/UnisaveFixture/Scripts/SteamMicrotransactions/SteamPurchasingClient.cs).
-
-<!--
-NOTE TO MYSELF:
-The changelog file can be on Github, linked from here.
--->
