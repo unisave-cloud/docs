@@ -7,6 +7,8 @@
     - [Error handling](#error-handling)
     - [The underlying .NET instance](#the-underlying-net-instance)
 - [Testing](#testing)
+    - [Faking responses](#faking-responses)
+    - [Inspecting requests](#inspecting-requests)
 
 Unisave provides a thin wrapper around the .NET `HttpClient` that lets you easily make HTTP requests to external web services.
 
@@ -217,5 +219,145 @@ response.Original.ReasonPhrase; // "Not found"
 <a name="testing"></a>
 ## Testing
 
+This section is related to automated testing of your backend. Read the [testing page](testing) to learn more.
 
-TODO
+The `Http.Fake(...)` method allows you to return dummy responses when requests are made.
+
+
+<a name="faking-responses"></a>
+### Faking responses
+
+For example you can return an empty `200` status code response for every request made just by calling the `Fake` method without any arguments:
+
+```cs
+Http.Fake();
+
+var response = Http.Post(...);
+```
+
+You can also fake only a specific URL and specify the response to be returned:
+
+```cs
+Http.Fake("github.com/*", Http.Response(new JsonObject {
+    ["foo"] = "bar"
+}, 200));
+
+Http.Fake(
+    "google.com/*",
+    Http.Response("Hello!", "text/plain")
+);
+```
+
+You can also fake response headers:
+
+```cs
+Http.Fake("google.com/*",
+    Http.Response(
+        new JsonObject(),
+        200,
+        new Dictionary<string, string> {
+            ["X-Header"] = "value"
+        }
+    )
+);
+```
+
+Again, if you omit the URL address, it will fake all requests:
+
+```cs
+Http.Fake(
+    Http.Response(...)
+);
+```
+
+
+#### Response sequences
+
+Sometimes you want to return a sequence of responses from a URL. You can use the `Http.Sequence()` method for that:
+
+```cs
+Http.Fake(
+    Http.Sequence()
+        .Push("Hello!", "text/plain", 200)
+        .Push(new JsonObject {...}, 200, headers)
+        .PushStatus(404)
+);
+```
+
+When all the responses have been consumed, any furter requests will throw an exception. You may, however, specify a default response that should be returned when the sequence is empty, you may use the `WhenEmpty` method:
+
+```cs
+Http.Fake(
+    Http.Sequence()
+        .Push(...)
+        .Push(...)
+        .WhenEmpty(Http.Response(...))
+);
+```
+
+But if you want to return just a plain `200` empty response, you can simplify it to:
+
+```cs
+Http.Fake(
+    Http.Sequence()
+        .Push(...)
+        .Push(...)
+        .DontFailWhenEmpty()
+);
+```
+
+
+#### Fake callback
+
+If you require more complicated logic to determine what responses to return, you may pass a callback to the faking method. This callback will receive an instance of `Unisave.Http.Client.Request` and should return a response instance.
+
+```cs
+Http.Fake("test.com/*"
+    request => {
+        string name = request["name"];
+        return Http.Response($"Hello {name}!");
+    }
+);
+```
+
+> **Note:** If the callback returns `null`, it will be ignored and the next callback in the row will be called. This continues until there are no more callbacks and then the request gets sent for real. All the faking methods described above actually just register callbacks under the hood.
+
+
+<a name="inspecting-requests"></a>
+### Inspecting requests
+
+When faking responses, you may sometimes want to inspect the requests that have been made in order to check that your backend is sending the correct data or headers. You may acomplish this by calling the `Http.AssertSent` method after calling `Http.Fake`.
+
+The `AssertSent` method accepts a callback which will be given an instance of a `Unisave.Http.Client.Request` and it should return a boolean value indicating if the request matches your expectations. In order for the test to pass, at least one request must have been issued matching the given expectations:
+
+```cs
+Http.Fake();
+
+Http.WithHeaders(new Dictionary<string, string> {
+    ["X-First"] = "foo"
+}).Post("http://test.com/players", new JsonObject {
+    ["name"] = "Bob",
+    ["coins"] = 123
+});
+
+Http.AssertSent(request =>
+    request.HasHeader("X-First", "foo") &&
+    request.Url == "https://test.com/players" &&
+    request["name"] == "Bob" &&
+    request["coins"] == 123
+);
+```
+
+You may also assert that a specific request was not sent:
+
+```cs
+Http.AssertNotSent(request =>
+    request.Url == "http://test.com/foo"
+);
+```
+
+Or you might want to check that no requests were sent at all:
+
+```cs
+Http.AssertNothingSent();
+```

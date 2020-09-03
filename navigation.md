@@ -20,6 +20,8 @@
 
 [Environments](environments)
 
+[Logging](logging)
+
 
 ### Templates
 
@@ -50,3 +52,5 @@
 [Mail](mail)
 
 [Serialization](serialization)
+
+[Testing](testing)
