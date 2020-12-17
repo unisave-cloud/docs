@@ -79,7 +79,7 @@ It's usually more convenient to use a lambda expression for the callback:
 OnFacet<HomeFacet>
     .Call<string>(nameof(HomeFacet.GreetClient))
     .Then((greeting) => {
-        Debug.Log("Server greets you: " + serverGreeting);
+        Debug.Log("Server greets you: " + greeting);
     })
     .Done();
 ```
