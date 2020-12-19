@@ -49,6 +49,8 @@
 
 ### Advanced
 
+[Database](database)
+
 [HTTP Client](http-client)
 
 [Broadcasting](broadcasting)
