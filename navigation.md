@@ -20,6 +20,8 @@
 
 [Authentication](authentication)
 
+[Session](session)
+
 [Environments](environments)
 
 [Logging](logging)
