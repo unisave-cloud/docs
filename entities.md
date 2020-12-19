@@ -16,6 +16,7 @@
     - [Filter clause](#filter-clause)
 - [Singleton entities](#singleton-entities)
 - [Entity references](#entity-references)
+- [Designing entities](#designing-entities)
 
 <!--
 - [Transactions](#transactions)
@@ -381,6 +382,10 @@ PlayerEntity player = motorbike.owner.Find();
 ```
 
 Again, the owner can be `null` if the reference points nowhere.
+
+
+<a name="designing-entities"></a>
+## Designing entities
 
 
 <!--

@@ -9,6 +9,8 @@
 
 [Workflow](workflow)
 
+[FAQ](faq)
+
 
 ### Core
 
