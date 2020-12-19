@@ -46,6 +46,9 @@ Comparing the charts of daily active users by Unisave, Unity Analytics, and Stea
 **Sending mail**<br>
 You can make HTTP requests to any other web services from within your backend code. Use [Mailgun](https://www.mailgun.com/) to add email verification and password resets and you can use [Mailchimp](https://mailchimp.com/) to inform your players about in-game events.
 
+**Chat**<br>
+The [broadcasting system](broadcasting) lets you send notifications from server to clients. You can use it to build chat, matchmaker, real-time friend requests or even an entire turn-based game.
+
 
 ## What you cannot build
 
@@ -53,10 +56,7 @@ You can make HTTP requests to any other web services from within your backend co
 If you're looking for a real-time multiplayer solution, check out [Photon](https://www.photonengine.com/), [Mirror](https://mirror-networking.com/), or [MLAPI](https://mlapi.network/).
 
 **Request-response only**<br>
-The server-side code is only triggered by a request sent from your game client. This request has to processed in under 5 seconds and the response is then sent back. Unisave does not support long-running server-side code. This is not an issue most of the time though.
-
-**No chat**<br>
-A player-to-player chat cannot be implemented using Unisave because the server cannot send a message to a game client and notify it about the new message. The game client has to explicitly ask the server whether there are any new messages (this is called polling). The polling frequency required to keep the real-time feel generates too much traffic and it would burn through your quotas. Though this is not an issue for notifications and player-to-player messaging. There are other solutions that provide real-time chat (like [Photon](https://www.photonengine.com/chat) or [Vivox](https://www.vivox.com/)) or even video-chat ([Agora.io](https://www.agora.io/)).
+The server-side code is only triggered by a request sent from your game client. This request has to be processed in under 10 seconds and the response is then sent back. Unisave does not support long-running server-side code. This is not an issue most of the time though.
 
 
 ## Other points
@@ -68,7 +68,7 @@ Unisave targets specifically games written in Unity Engine. This lets you have a
 Data of your game are stored in the [ArangoDB](https://www.arangodb.com/) database. You can trust this established NoSQL database that no data will get lost. You can export and import data in the JSON format, access the data from a [web interface](https://www.arangodb.com/docs/stable/getting-started-web-interface.html), and query it using the arango query language ([AQL](https://www.arangodb.com/docs/stable/aql/)).
 
 **Security**<br>
-Game clients communicate with the Unisave cloud using HTTPS protocol to make sure no information can be leaked. Unisave also comes with player authentication templates that use proper password hashing.
+Game clients communicate with the Unisave cloud using HTTPS protocol to make sure no information leaks. Unisave also comes with player authentication templates that use proper password hashing.
 
 **Docker**<br>
 Each request is processed in an isolated docker container. This provides you with a level ground on which to build your game backend and it makes sure one request does not interfere with other requests being processed. The container is also often restarted so that you don't have to worry about memory leakage.
