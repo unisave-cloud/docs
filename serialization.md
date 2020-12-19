@@ -6,6 +6,10 @@
 - [What doesn't work](#what-doesnt-work)
 
 
+> **Outdated documentation page:**<br>
+> This documentation page is outdated and needs rewriting. For example polymorphism already works. If you have a question about a specific value you want to serialize, just ask it in the discord server.
+
+
 <a name="available-types"></a>
 ## Available types
 
@@ -55,11 +59,11 @@ class Motorbike
 }
 ```
 
-Unisave will serialize all public non-static fields.
+Unisave will serialize all non-static fields (both public and private).
 
-The type must have a parameterless constructor in order to be deserialized.
+~~The type must have a parameterless constructor in order to be deserialized.~~
 
-The `[Serializable]` attribute is not needed.
+~~The `[Serializable]` attribute is not needed.~~ Edit: The attribute needs to be serialized properly, planned feature.
 
 
 <a name="planned-types"></a>
@@ -77,7 +81,7 @@ The data is stored in the form of JSON. The format works well with hierarchical 
 
 > **Credit:** Unisave uses [LightJson](https://github.com/MarcosLopezC/LightJson), which is a wonderful lightweight library for working with JSON in C#
 
-When saving a field, Unisave looks at the type of the field and it will use this type for serialization regardless of type of the actual value.
+When saving a field, Unisave looks at the type of the field and it will use this type for serialization ~~regardless of type of the actual value~~.
 
 
 <a name="what-doesnt-work"></a>
@@ -100,8 +104,8 @@ Unisave does not target this usage, because such data is much more complex to wo
 
 The benefit is low and the complexity high. It's not worth implementing, because the entire structure of the serialized data would have to be different and not as easily readable (by a human).
 
-**Polymorphism**
+~~**Polymorphism**~~
 
-For polymorphism to work I would need to save the type together with the data itself (because I need to know the type during loading). This might be done for standard types, but it would be more difficult for user-defined types.
+~~For polymorphism to work I would need to save the type together with the data itself (because I need to know the type during loading). This might be done for standard types, but it would be more difficult for user-defined types.~~
 
-Also saving type information couples the database with your game very tightly making it difficult to change the data structure later.
+~~Also saving type information couples the database with your game very tightly making it difficult to change the data structure later.~~
