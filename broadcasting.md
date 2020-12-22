@@ -184,6 +184,8 @@ The server-side logic that handles the subscription is more interesting:
 
 ```cs
 using Unisave;
+using Unisave.Authentication;
+using Unisave.Broadcasting;
 using Unisave.Facades;
 using Unisave.Facets;
 
