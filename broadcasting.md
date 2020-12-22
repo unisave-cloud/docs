@@ -67,7 +67,7 @@ public class ActivePlayersChannel : BroadcastingChannel
 }
 ```
 
-All you have to do is provide a list of string parameters to the specific channel cosntructor.
+All you have to do is provide a list of string parameters to the specific channel constructor.
 
 > **Note:** The string identifier of a channel, with the parameters has to be at most 255 characters, so be careful with the parameters. The string identifier has the following structure:<br>
 > `Namespace.ChannelClass["parameter1", "another param"]`<br>
