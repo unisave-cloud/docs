@@ -15,6 +15,8 @@ Broadcasting is a system, that lets you send messages from the server to clients
 
 Your game client subscribes to a number of channels. Channel is a pipe through which messages flow from the server to subscribed clients. Your server-side code can then send messages into channels. It's just like YouTube.
 
+> **Note:** Broadcasting can only be used when your game is running. If you want a way to wake up a mobile device when it's idle, see [push notifications](push-notifications).
+
 
 <a name="defining-a-channel"></a>
 ## Defining a channel

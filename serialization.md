@@ -9,6 +9,11 @@
 > **Outdated documentation page:**<br>
 > This documentation page is outdated and needs rewriting. For example polymorphism already works. If you have a question about a specific value you want to serialize, just ask it in the discord server.
 
+<!--
+    TODO: describe, how one can use the serializer if they need to send
+    data somewhere (e.g. via http client)
+-->
+
 
 <a name="available-types"></a>
 ## Available types
