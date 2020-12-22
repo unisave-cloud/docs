@@ -146,7 +146,7 @@ using Unisave.Broadcasting;
 using Unisave.Facades;
 using UnityEngine;
 
-public class ChatController : UnisaveBroadcastingClient
+public class ChatClient : UnisaveBroadcastingClient
 {
     private async void OnEnable()
     {
@@ -186,6 +186,8 @@ The server-side logic that handles the subscription is more interesting:
 using Unisave;
 using Unisave.Facades;
 using Unisave.Facets;
+using Unisave.Broadcasting;
+using Unisave.Authentication;
 
 public class ChatFacet : Facet
 {
@@ -245,7 +247,7 @@ using Unisave.Broadcasting;
 using Unisave.Facades;
 using UnityEngine;
 
-public class ChatController : UnisaveBroadcastingClient
+public class ChatClient : UnisaveBroadcastingClient
 {
     ...
 
