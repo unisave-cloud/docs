@@ -14,7 +14,7 @@ When you make a facet call, the call also contains a piece of data called sessio
 
 When you start your game (or Unity Editor), the session ID is not known. Therefore the first request sent will not contain it and that will trigger the start of a new session. Then, when your game exists, or is inactive for more than 60 minutes, the session ID is automatically forgotten.
 
-The session storage is a small key-value storage (like `PlayerPrefs`) that is bound to a session ID and stored on the server (in the database). It is used to remember information about the session. The `Auth` facade uses session storage to remember who is logged in within the session. That's why you send you email and password only once and then the server remembers. The session ID acts as a temporary password that identifies you for the duration of a session.
+The session storage is a small key-value storage (like `PlayerPrefs`) that is bound to a session ID and stored on the server (in the database). It is used to remember information about the session. The `Auth` facade uses session storage to remember who is logged in within the session. That's why you send your email and password only once and then the server remembers. The session ID acts as a temporary password that identifies you for the duration of a session.
 
 
 <a name="using-session-storage"></a>
