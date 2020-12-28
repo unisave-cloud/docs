@@ -148,4 +148,4 @@ Lastly, ArangoDB lets you create fulltext indexes that are designed to handle te
 As you can see, ArangoDB is a modern and versatile tool that can help you solve many different data-related problems.
 
 > **Foxx microsevices:**<br>
-> Although ArangoDB lets you build javascript microservices right on top of the database, Unisave does not provide this functionality to you. This is beacuse the logic you would write into these services is the logic you should place into your game backend. If you know how to write foxx microservices then why use Unisave? Or you can have an on-premise database and link it up with Unsiave via environment variables. Also an option.
+> Although ArangoDB lets you build javascript microservices right on top of the database, Unisave does not provide this functionality to you. This is beacuse the logic you would write into these services is the logic you should place into your game backend. If you know how to write foxx microservices then why use Unisave? Or you can have an on-premise database and link it up with Unisave via environment variables. Also an option.
