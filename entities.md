@@ -14,18 +14,12 @@
     - [Retrieving all entities of a given type](#retrieving-all-entities-of-given-type)
     - [Retrieving the first entity](#retrieving-the-first-entity)
     - [Filter clause](#filter-clause)
+- [Sending entities to the client](#sending-entities-to-the-client)
+    - [Hiding sensitive data](#hiding-sensitive-data)
+    - [Mass assignment](#mass-assignment)
 - [Singleton entities](#singleton-entities)
 - [Entity references](#entity-references)
 - [Designing entities](#designing-entities)
-
-<!--
-- [Transactions](#transactions)
-    - [Manual transactions](#manual-transactions)
-- [Locks](#locks)
-    - [Lock for update](#lock-for-update)
-    - [Shared lock](#shared-lock)
-    - [Deadlocks](#deadlocks)
--->
 
 
 <a name="introduction"></a>
@@ -284,6 +278,81 @@ var wealthyPremiumPlayers = DB.TakeAll<PlayerEntity>()
 ```
 
 
+<a name="sending-entities-to-the-client"></a>
+## Sending entities to the client
+
+It may often be convenient to send entire entities to the client, either as read-only or even for modification. You need to be careful though, not to leak any sensitive information or to give the client too much control over the database.
+
+
+<a name="hiding-sensitive-data"></a>
+### Hiding sensitive data
+
+Oftentimes, entities contain data that the client shouldn't know about (e.g. passwords or email addresses). You can add a `[DontLeaveServer]` attribute to these fields and they will be automatically removed when sent outside the server.
+
+```cs
+public class PlayerEntity : Entity
+{
+    public string name;
+
+    [DontLeaveServer]
+    public string password;
+}
+```
+
+For more information about the attribute, read the corresponding [section on serialization](serialization#the-dont-leave-server-attribute).
+
+
+<a name="mass-assignment"></a>
+### Mass assignment
+
+Even riskier situation happens, when you get an entity from the client and you would blindly save it. The entity not only contains data, but also the ID and other metadata. The client could have easily modified the ID, giving him the ability to **overwrite any entity** of the same type.
+
+For this reason, calling `.Save()` on an entity, received as an argument of a facet method, will throw an `EntitySecurityException`.
+
+The secure way to handle this situation requires a few steps. First, you use the `[Fillable]` attribute, to specify which fields even can be modified by the client.
+
+```cs
+public class PlayerEntity : Entity
+{
+    [Fillable]
+    public string name;
+
+    [Fillable]
+    public Color favouriteColor;
+
+    public string password;
+
+    public DateTime? bannedUntil;
+}
+```
+
+Now you can rewrite your saving facet method like this:
+
+```cs
+public class HomaFacet : Facet
+{
+    public void SavePlayer(PlayerEntity givenPlayer)
+    {
+        var player = Auth.GetPlayer<PlayerEntity>();
+
+        player.FillWith(givenPlayer);
+
+        player.Save();
+    }
+}
+```
+
+The `.FillWith` method copies values of fields marked with the `[Fillable]` attribute. And since the `player` variable contains the truly authenticated player, the modification happens to the correct entity.
+
+You have to think about the `givenPlayer` as a plain data container. Any entity, sent outside the server, automatically looses its coupling with the database and is degraded to a plain data container.
+
+> **Note:** Any entity references on the `givenPlayer` are also invalid, since the client could have changed them and dereferencing them would be insecure.
+
+> **Note:** Calling `.Refresh()` and `.Delete()` on `givenPlayer` are also invalid and will throw an exception.
+
+> **Note:** There's only one time, you can call `.Save()` and that is, when the entity was created on the client and does not exist in the database yet. Then it will be inserted and no existing database data could be overwritten this way.
+
+
 <a name="singleton-entities"></a>
 ## Singleton entities
 
@@ -478,195 +547,3 @@ As a rule of thumb, you shouldn't go above about **10KB - 50KB**. You can estima
 That being said, if you know what you're doing and you want to store larger amounts of data, you can go to 100KB or even 1MB, just keep in mind that the system isn't optimized for such scenarios. Maybe what you're really looking for is an object storage system, like [Amazon S3](https://aws.amazon.com/s3/) or [DigitalOcean Spaces](https://www.digitalocean.com/products/spaces/).
 
 Also, ArangoDB has [an extensive page](https://www.arangodb.com/docs/stable/data-modeling-operational-factors.html) on this topic that goes into more detail.
-
-
-<!--
-
-<a name="transactions"></a>
-## Transactions
-
-Transaction is a set of database operations that is performed entirely, or not at all. This is useful in that when an exception occurs inside a transaction, the whole transaction can be rolled back.
-
-```cs
-var someEntity = SomeEntity.Get();
-
-someEntity.Foo; // 42
-
-DB.Transaction(() => {
-    someEntity.Foo = 0;
-    
-    someEntity.Save();
-
-    throw new Exception();
-});
-
-// Foo will still have the value of 42
-// even though the whole execution
-// crashed after Save was called.
-```
-
-You can also pass a return value through a transaction:
-
-```cs
-public class SomeFacet : Facet
-{
-    public int SomeMethod()
-    {
-        return DB.Transaction(() => {
-            
-            // ...
-
-            return 42;
-        });
-    }
-}
-```
-
-Transactions can even be nested inside each other, although locks persist until the topmost transaction finishes.
-
-Transaction depth can be queried:
-
-```cs
-DB.TransactionDepth(); // int
-```
-
-
-<a name="manual-transactions"></a>
-### Manual transactions
-
-You can start a new transaction:
-
-```cs
-DB.StartTransaction();
-```
-
-You can rollback a transaction:
-
-```cs
-DB.Rollback();
-```
-
-And you can commit a transaction:
-
-```cs
-DB.Commit();
-```
-
-
-<a name="locks"></a>
-## Locks
-
-When your game grows in popularity, many people will play it simultaneously. This might cause problems when two players try to modify an entity at the same time. This is called a race condition.
-
-Imagine we have a `StatisticsEntity` and each time a player logs in, we increment some counter:
-
-```cs
-using System;
-using Unisave;
-
-public class StatisticsEntity : Entity
-{
-    [X] public int LoginCount { get; set; }
-
-    // just a singleton pattern
-    // see the section above on singleton entities
-    public static StatisticsEntity Get()
-    {
-        var entity = GetEntity<StatisticsEntity>.First();
-
-        if (entity == null)
-        {
-            entity = new StatisticsEntity();
-            entity.Save();
-        }
-
-        return entity;
-    }
-}
-
-public class SomeFacet : Facet
-{
-    public void IncrementCounter()
-    {
-        var entity = StatisticsEntity.Get();
-
-        entity.LoginCount++;
-
-        entity.Save();
-    }
-}
-```
-
-What can happen is that both players load the entity simultaneously with counter value `N`. Both increment the value to `N+1` and then both save `N+1` into the database instead of `N+2`.
-
-> **Note:** This problem concerns primarily *game entities* and *shared entities*. *Player entities* are usually modified by their owner, so there should not be a problem.
-
-> **Note:** Also if you just read an entity, such problem does not bother you. This problem occurs only when modifying data.
-
-What we need is to allow only one player to edit the entity at a time. For that purpouse locks exist.
-
-
-<a name="lock-for-update"></a>
-### Lock for update
-
-Let's modify the example in the following way:
-
-```cs
-public class SomeFacet : Facet
-{
-    public void IncrementCounter()
-    {
-        var entity = StatisticsEntity.Get();
-
-        DB.Transaction(() => {
-            entity.RefreshAndLockForUpdate();
-            
-            entity.LoginCount++;
-            
-            entity.Save();
-        });
-    }
-}
-```
-
-The `RefreshAndLockForUpdate` method refreshes the entity and locks it so that noone else can access it. The operation is performed after the lock with certainty, that we are the only one acting on the entity. Then the entity is saved and the transaction is committed, which releases the lock.
-
-> **Warning:** Locks can only be applied inside transactions, because the transaction determines their scope. Commit of a transaction releases all locks.
-
-`RefreshAndLockForUpdate` prevents other players from locking or modifying the entity. Non-locking players can however still read the value.
-
-> **Note:** This kind of lock is sometimes also called an exclusive lock.
-
-Usual usecase for this lock is when you modify value of an entity based on it's current value (e.g. incrementing a counter).
-
-
-<a name="shared-lock"></a>
-### Shared lock
-
-A weaker kind of lock is called a shared lock. You can acquire it as follows:
-
-```cs
-DB.Transaction(() => {
-    someEntity.RefreshAndLockShared();
-
-    // ...
-});
-```
-
-This lock prevents other players from modifying the entity, but it allows them to lock it with a shared lock as well.
-
-
-<a name="deadlocks"></a>
-### Deadlocks
-
-Deadlock occurs when you have multiple players waiting on locks in a cycle. Such scenario is detected and a `Unisave.Exceptions.DatabaseDeadlockException` is thrown and the transaction is rolled back.
-
-Number of retry attempts can be specified as the second argument to the `Transaction` method.
-
-```cs
-DB.Transaction(() => {
-    // ...
-}, 5);
-```
-
--->

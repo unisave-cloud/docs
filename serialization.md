@@ -11,7 +11,7 @@
 - [Polymorphism](#polymorphism)
 - [Security](#security)
     - [The *don't leave server* attribute](#the-dont-leave-server-attribute)
-    - [Insecure deserialization attack](#the-dont-leave-server-attribute)
+    - [Insecure deserialization attack](#insecure-deserialization-attack)
 - [Limitations](#limitations)
 
 Serialization is the process of converting data inside your game's memory to a format that can be stored or sent over the network. Unisave performs serialization anytime you call a facet or save an entity, so understanding its behaviour will help you get the most out of Unisave.
@@ -368,7 +368,7 @@ public class PlayerEntity : Entity
 The attribute may be added to entities or custom data types. It is ignored on types that implement `I(Unisave)Serializable` or have a specific serializer registered.
 
 
-<a name="the-dont-leave-server-attribute"></a>
+<a name="insecure-deserialization-attack"></a>
 ### Insecure deserialization attack
 
 **You should never create a facet method, that takes an `object`, or `dynamic` as its argument.**
