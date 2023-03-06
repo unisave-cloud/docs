@@ -33,7 +33,7 @@ var response = Http.WithBasicAuth("api", key)
             $"If you didn't want to reset your password, " +
             $"ignore this email."
     })
-    .Post($"https://{apiDomain}/v3/{gameDomain}/messages")
+    .Post($"https://{apiDomain}/v3/{gameDomain}/messages");
 
 response.Throw(); // throws when the response is not "200 OK"
 ```
